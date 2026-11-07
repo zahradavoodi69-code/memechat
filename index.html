@@ -247,6 +247,9 @@ button.ghost{background:var(--input);color:var(--text);border:1px solid #3d3428}
 #hr .hdrCall:hover{background:rgba(255,179,71,.22);box-shadow:0 3px 12px rgba(255,179,71,.28)}
 #hr .hdrCall:active{transform:scale(.9)}
 #hr .hdrCall svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+/* حتی اگر دکمه از composer به هدر جابه‌جا شده باشد، خارج از پیویِ باز نمایش نده. */
+#app:not(.mcPVChatActive) #callBtn{display:none!important}
+@supports selector(:has(*)){#app:not(:has(#secChat.on)) #callBtn{display:none!important}}
 .row{transition:background .15s}
 .btn:active,.qbtn:active{transform:scale(.97)}
 #header{box-shadow:0 2px 14px rgba(0,0,0,.45)}
@@ -1536,6 +1539,7 @@ function enter(u){
   me=u;
   var sp=$("bootSplash");if(sp)sp.remove();
   $("login").style.display="none";$("app").style.display="flex";
+  $("app").classList.remove("mcPVChatActive");
   if($("callBtn"))$("callBtn").style.display="none";
   paint();try{mcApplyChatBg();}catch(e){}poll(true);startPolling();
   try{startCallWatch();}catch(e){}
@@ -7341,6 +7345,7 @@ function mcStudioHelp() {
 var __go = go;
 go = function (s) {
   /* دکمهٔ تماس فقط داخل گفت‌وگوی پیوی بازشده دیده می‌شود. */
+  if ($("app")) $("app").classList.remove("mcPVChatActive");
   if ($("callBtn")) $("callBtn").style.display = "none";
   if (s === "studio" || s === "home") {
     inChat = false; chat = null;
@@ -7403,6 +7408,7 @@ open = function (type, id, title, topic) {
   if ($("modal") && getComputedStyle($("modal")).display !== "none") closeModal();
   document.querySelectorAll(".sec").forEach(function (x) { x.classList.remove("on"); });
   $("secChat").classList.add("on");
+  $("app").classList.toggle("mcPVChatActive", type === "pv");
   $("htitle").textContent = title;
   try {
     var cbx = $("callBtn");
