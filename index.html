@@ -547,6 +547,92 @@ body{background:var(--bg);font-family:Tahoma,"Segoe UI",system-ui,sans-serif}
 .mcImgX{position:absolute;top:14px;left:14px;width:40px;height:40px;border-radius:50%;border:none;
   background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;justify-content:center}
 
+/* پیام تصویری و پلیر تمام‌صفحه؛ همان تم تیره/نارنجی میم‌چت */
+.mw.mcMediaPost{max-width:min(94%,420px)}
+.mw.mcMediaPost .bub{width:min(350px,calc(100vw - 68px));max-width:100%;padding:4px;border-radius:19px;
+  border:1px solid rgba(255,140,0,.19);overflow:hidden}
+.mw.mcMediaPost.me .bub{background:linear-gradient(150deg,#292018,#171719 55%)}
+.mw.mcMediaPost.other .bub{background:#1b1b1f}
+.mw.mcMediaPost .nmline{display:flex;margin:0 0 3px;font-size:.9rem;color:var(--text);align-items:center}
+.mcMediaFrame{position:relative;overflow:hidden;border-radius:15px;background:#09090b;min-height:155px}
+.mcMediaPreview{display:block;position:relative;width:100%;border:0;padding:0;cursor:pointer;color:#fff;background:#09090b}
+.mcMediaPreview img,.mcMediaPreview video{display:block;width:100%;min-height:155px;max-height:min(51vh,430px);object-fit:contain;pointer-events:none}
+.mcMediaPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;
+  display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,200,130,.65);border-radius:50%;
+  background:rgba(10,9,8,.76);color:var(--accent);box-shadow:0 4px 26px rgba(0,0,0,.55),0 0 18px rgba(255,140,0,.24)}
+.mcMediaPlay .ic{width:26px;height:26px;margin-inline-start:3px;fill:currentColor;stroke-width:1.2}
+.mcMediaDuration{position:absolute;top:9px;left:9px;direction:ltr;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.14);
+  color:#f9f6ee;border-radius:9px;padding:4px 8px;font-size:.72rem;font-variant-numeric:tabular-nums}
+.mcMediaInfo{padding:10px 10px 6px;min-width:0}
+.mcMediaInfo .mcMediaCaption{line-height:1.6;color:#f7f3ea;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 9px}
+.mcMediaInfo .mcMediaCaption:empty{display:none}
+.mcMediaHandle{display:block;width:max-content;max-width:100%;margin-inline-start:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  background:none;border:0;padding:0;color:var(--accent);font-size:.75rem;direction:ltr;text-align:left;cursor:pointer}
+.mcMediaInfo .reacts{margin:9px 0 3px;gap:5px}
+.mcMediaInfo .react{background:#292932;border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:4px 10px;font-size:.84rem;display:inline-flex;align-items:center;gap:3px}
+.mcMediaInfo .react .emsvg{width:20px;height:20px}
+.mcMediaFoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px;border-top:1px solid rgba(255,255,255,.075);padding-top:7px}
+.mcMediaFoot .meta{margin:0;color:#aaa5a0;font-size:.7rem}
+.mcMediaDl{display:inline-flex;align-items:center;gap:4px;color:var(--accent);text-decoration:none;font-size:.72rem;font-weight:bold;
+  padding:4px 7px;border-radius:8px;background:rgba(255,140,0,.10);border:1px solid rgba(255,140,0,.20)}
+.mcMediaDl .ic{width:15px;height:15px}
+.mcMediaPending{width:100%;min-height:155px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#131316,#241b10);color:var(--gold)}
+.mcMediaPending button{max-width:90%;border-radius:12px}
+.mcMediaPending .mcMediaPreview{max-width:none;min-height:155px;display:flex;align-items:center;justify-content:center;
+  color:var(--accent);background:linear-gradient(135deg,#141416,#2c2116);font-size:.84rem;font-weight:bold;outline:none}
+.mcMediaPending .mcMediaPreview:focus-visible{outline:2px solid var(--accent);outline-offset:-4px;border-radius:13px}
+.mcMediaViewer,.mcMediaGallery{position:fixed;inset:0;display:flex;flex-direction:column;background:#080809;color:#f7f3ea;
+  z-index:1550;direction:rtl;isolation:isolate}
+.mcMediaGallery{z-index:1540;background:#101012}
+.mcMvTop{display:flex;align-items:center;gap:11px;padding:calc(9px + env(safe-area-inset-top)) 12px 9px;
+  background:linear-gradient(180deg,#171718,#0a0a0b);border-bottom:1px solid #292522;min-height:58px;direction:ltr;flex:none}
+.mcMvTopInfo{min-width:0;flex:1;direction:rtl;text-align:right}
+.mcMvTitle{font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.93rem}
+.mcMvSub{color:#ada69e;font-size:.69rem;margin-top:3px;direction:ltr;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcMvBtn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;
+  color:#f7f3ea;background:#242427;border:1px solid #383335;cursor:pointer;flex:none}
+.mcMvBtn .ic{width:21px;height:21px}
+.mcMvBtn:active,.mcMvMenu button:active{background:rgba(255,140,0,.24)}
+.mcMvStage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#050506;overflow:hidden}
+.mcMvStage>video,.mcMvStage>img{display:block;width:100%;height:100%;object-fit:contain;max-width:100%;max-height:100%}
+.mcMvBigPlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;
+  border:1px solid rgba(255,165,56,.64);background:rgba(12,11,10,.78);color:var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mcMvBigPlay .ic{width:32px;height:32px;fill:currentColor;stroke-width:1}
+.mcMediaViewer.isPlaying .mcMvBigPlay{opacity:0;pointer-events:none}
+.mcMvBottom{flex:none;padding:10px 15px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(0deg,#111113,#080809);
+  border-top:1px solid #242123;max-height:34vh;overflow-y:auto}
+.mcMvCaption{font-size:.82rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin-bottom:5px}
+.mcMvAuthor{color:var(--accent);font-size:.76rem;direction:ltr;text-align:right;margin-bottom:8px}
+.mcMvControls{display:flex;align-items:center;gap:9px;direction:ltr}
+.mcMvControls .mcMvBtn{width:37px;height:37px;flex:none}
+.mcMvSeek{display:block;min-width:0;max-width:none;width:auto;flex:1;height:26px;padding:0;margin:0;
+  appearance:auto;accent-color:var(--accent);background:transparent;border:0;border-radius:0;cursor:pointer}
+.mcMvClock{font-size:.7rem;direction:ltr;white-space:nowrap;font-variant-numeric:tabular-nums;color:#d7d2cc}
+.mcMvMenu{position:absolute;z-index:3;top:calc(59px + env(safe-area-inset-top));right:10px;width:min(285px,calc(100vw - 20px));
+  max-height:min(70vh,520px);overflow:auto;background:#202023;border:1px solid #494039;border-radius:15px;
+  box-shadow:0 18px 44px rgba(0,0,0,.74);padding:5px;direction:rtl}
+.mcMvMenu[hidden],.mcMvSpeedList[hidden]{display:none}
+.mcMvMenu button{width:100%;border:0;border-radius:10px;padding:11px 10px;display:flex;align-items:center;gap:10px;
+  text-align:right;background:transparent;color:#f7f3ea;font-size:.84rem;cursor:pointer}
+.mcMvMenu button .ic{width:20px;height:20px;color:var(--accent);flex:none}
+.mcMvMenu button+button{border-top:1px solid rgba(255,255,255,.045)}
+.mcMvSpeedList{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px 7px 9px;direction:ltr}
+.mcMvSpeedList button{justify-content:center;padding:7px 3px;font-size:.73rem;border:1px solid #3d3530;border-radius:8px}
+.mcMvSpeedList button.on{border-color:var(--accent);color:var(--accent);background:rgba(255,140,0,.11)}
+.mcMediaGalleryGrid{flex:1;min-height:0;overflow-y:auto;padding:13px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  align-content:start;gap:8px}
+.mcMediaGalleryGrid button{position:relative;aspect-ratio:1;overflow:hidden;border-radius:12px;border:1px solid #38302a;
+  background:#18181b;color:#f5ede4;cursor:pointer;padding:0}
+.mcMediaGalleryGrid img,.mcMediaGalleryGrid video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.mcMediaGalleryGrid .ic{width:29px;height:29px;color:var(--accent)}
+.mcMediaGalleryGrid .mcGalPlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:33px;height:33px;border-radius:50%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center}
+.mcMediaGalleryGrid .mcGalPlay .ic{width:18px;height:18px;fill:currentColor}
+.mcMediaGalleryMore{margin:0 13px calc(12px + env(safe-area-inset-bottom));padding:11px;background:#2b2012;
+  border:1px solid rgba(255,140,0,.32);border-radius:11px;color:var(--accent);cursor:pointer}
+@media(max-width:360px){.mcMvTop{gap:7px;padding-inline:8px}.mcMvBottom{padding-inline:10px}.mcMvClock{font-size:.62rem}}
+
 /* ---------------------------- ویرایش پروفایل ---------------------------- */
 .editAvaRow{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:16px}
 .editAva{position:relative;line-height:0;cursor:pointer}
@@ -1958,7 +2044,12 @@ function drawReacts(box,rs){
 }
 function build(m){
   var mine=me&&String(m.fromId)===String(me.id);
+  var mediaType=m.file?String(m.file.type||((m.file.data||"").match(/^data:([^;]+)/)||[])[1]||""):"";
+  var isRoundVideo=!!(m.file&&/^video\//.test(mediaType)&&/^round_/i.test(m.file.name||""));
+  var mediaVisual=!!(m.file&&/^(image|video)\//.test(mediaType)&&!isRoundVideo);
+  var visualDownload=null;
   var w=document.createElement("div");w.className="mw "+(mine?"me":"other");
+  if(mediaVisual)w.classList.add("mcMediaPost");
   var av=document.createElement("div");av.className="mav";
   if(m.ava){AVA_CACHE[m.fromId]=m.ava}
   var _ava=m.ava||AVA_CACHE[m.fromId];
@@ -1987,45 +2078,85 @@ function build(m){
   var t=document.createElement("div");t.className="tx";
   if(m.meme&&m.meme.t){t.innerHTML='<div style="text-align:center"><div>'+emojiChar(m.meme.e,40)+'</div><div style="font-weight:bold;color:var(--gold)">'+esc(m.meme.t)+'</div></div>'}
   else { var tx0=fmt(m.text); t.innerHTML = mcIsCens(m.text) ? '<span class="censBox" onclick="this.classList.add(\'open\')" title="محتوای حساس — برای نمایش بزن">'+tx0+'</span>' : tx0; }
-  b.appendChild(t);
+  if(mediaVisual)t.classList.add("mcMediaCaption");
+  else b.appendChild(t);
   if(m.file&&m.file.pending&&!m.file.data){
-    var fpd=document.createElement("div");fpd.style.marginTop="6px";
-    var flabel=(m.file.type&&m.file.type.indexOf("video")===0)?"نمایش ویدیو":(m.file.type&&m.file.type.indexOf("image")===0)?"نمایش عکس":"نمایش رسانه";
-    fpd.innerHTML='<button class="btn small" type="button">'+flabel+' — '+esc(m.file.name||"فایل")+'</button>';
-    fpd.querySelector("button").onclick=function(){
-      var btn=this;btn.disabled=true;btn.textContent="داره میاد…";
-      mcLoadMsgFile(m.id).then(function(ok){ if(!ok){btn.disabled=false;btn.textContent="دوباره بزن";} });
+    var fpd=document.createElement("div");fpd.style.marginTop=mediaVisual?"0":"6px";
+    if(mediaVisual)fpd.className="mcMediaFrame mcMediaPending";
+    var flabel=(mediaType.indexOf("video")===0)?"نمایش ویدیو":(mediaType.indexOf("image")===0)?"نمایش عکس":"نمایش رسانه";
+    fpd.innerHTML='<button class="btn small" type="button">'+(mediaVisual?mcIco("download")+" ":"")+flabel+' — '+esc(m.file.name||"فایل")+'</button>';
+    fpd.querySelector("button").onclick=function(ev){
+      ev.stopPropagation();var btn=this;btn.disabled=true;btn.textContent="داره میاد…";
+      mcLoadMsgFile(m.id).then(function(ok){if(ok&&mediaVisual)mcMediaOpen(m.id);else if(!ok){btn.disabled=false;btn.textContent="دوباره بزن";}});
     };
     b.appendChild(fpd);
   }
-  if(m.file&&m.file.data&&(!SET||SET.autoLoadMedia!==false)){
-    var f=document.createElement("div");f.style.marginTop="6px";
-    var ft=String(m.file.type||"");
-    if(ft.indexOf("video")===0){
-      var isRound = /^round_/.test(String(m.file.name||""));
-      f.innerHTML = isRound
-        ? '<div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px"><video src="'+ea(m.file.data)+'" controls playsinline muted style="width:180px;height:180px;border-radius:50%;object-fit:cover;max-width:180px;background:#000"></video><button type="button" class="btn small" style="margin-top:0" onclick="mcSpeed(this)">1x</button></div>'
-        : '<div style="display:flex;align-items:center;gap:6px;max-width:260px"><video src="'+ea(m.file.data)+'" controls playsinline preload="metadata" style="flex:1;min-width:0;max-height:230px;border-radius:10px"></video><button type="button" class="btn small" style="margin-top:0" onclick="mcSpeed(this)">1x</button></div>';
+  if(m.file&&m.file.data&&(mediaVisual||!SET||SET.autoLoadMedia!==false)){
+    var f=document.createElement("div");f.style.marginTop=mediaVisual?"0":"6px";
+    var ft=mediaType;
+    if(mediaVisual){
+      f.className="mcMediaFrame";
+      var preview=document.createElement("button");preview.type="button";preview.className="mcMediaPreview";
+      preview.setAttribute("aria-label",ft.indexOf("video")===0?"پخش ویدیو":"نمایش عکس");
+      preview.onclick=function(ev){ev.stopPropagation();mcMediaOpen(m.id)};
+      if(SET&&SET.autoLoadMedia===false){
+        f.classList.add("mcMediaPending");preview.textContent=ft.indexOf("video")===0?"برای نمایش ویدیو بزن":"برای نمایش عکس بزن";
+      }else{
+        var mediaEl=document.createElement(ft.indexOf("video")===0?"video":"img");
+        mediaEl.src=m.file.data;
+        if(ft.indexOf("video")===0){
+          mediaEl.muted=true;mediaEl.playsInline=true;mediaEl.preload="metadata";
+          mediaEl.setAttribute("playsinline","");
+          var dur=document.createElement("span");dur.className="mcMediaDuration";
+          mediaEl.addEventListener("loadedmetadata",function(){if(isFinite(mediaEl.duration)&&mediaEl.duration>0){dur.textContent=mcMediaClock(mediaEl.duration);preview.appendChild(dur)}});
+          mediaEl.addEventListener("error",function(){if(!preview.querySelector(".mcMediaError")){var err=document.createElement("span");err.className="mcMediaDuration mcMediaError";err.textContent="ویدیو باز نشد؛ دانلود کن";preview.appendChild(err)}});
+        }else{
+          mediaEl.addEventListener("error",function(){if(!preview.querySelector(".mcMediaError")){var err=document.createElement("span");err.className="mcMediaDuration mcMediaError";err.textContent="عکس باز نشد؛ دانلود کن";preview.appendChild(err)}});
+        }
+        mediaEl.alt=ft.indexOf("image")===0?"عکس پیام":"";
+        preview.appendChild(mediaEl);
+        if(ft.indexOf("video")===0){var playIcon=document.createElement("span");playIcon.className="mcMediaPlay";playIcon.innerHTML=mcIco("play");preview.appendChild(playIcon)}
+      }
+      f.appendChild(preview);
+      visualDownload=document.createElement("button");visualDownload.type="button";visualDownload.className="mcMediaDl";
+      visualDownload.innerHTML=mcIco("download")+" دانلود";
+      visualDownload.onclick=function(ev){ev.stopPropagation();mcMediaDownload(m.id)};
+    }else{
+      if(ft.indexOf("video")===0){
+        f.innerHTML='<div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px"><video src="'+ea(m.file.data)+'" controls playsinline muted style="width:180px;height:180px;border-radius:50%;object-fit:cover;max-width:180px;background:#000"></video><button type="button" class="btn small" style="margin-top:0" onclick="mcSpeed(this)">1x</button><button type="button" class="btn small" onclick="event.stopPropagation();mcMediaOpen(\''+ea(m.id)+'\')">تمام‌صفحه</button></div>';
+      }
+      else if(ft.indexOf("audio")===0){f.innerHTML='<div style="display:flex;align-items:center;gap:6px;max-width:260px"><audio src="'+ea(m.file.data)+'" controls preload="metadata" style="flex:1;min-width:0;height:44px"></audio><button type="button" class="btn small" style="margin-top:0" onclick="var a=this.parentElement.querySelector(\'audio\');a.paused?a.play():a.pause()">پخش</button><button type="button" class="btn small" style="margin-top:0" onclick="mcSpeed(this)">1x</button></div>'}
+      else{f.innerHTML='<a href="'+ea(m.file.data)+'" download="'+ea(m.file.name||"file")+'" style="color:var(--accent)">دانلود '+esc(m.file.name||"فایل")+'</a>'}
+      var mediaEls=f.querySelectorAll("img,video,audio");
+      for(var mi=0;mi<mediaEls.length;mi++){(function(el){
+        el.onerror=function(){f.innerHTML='<a href="'+ea(m.file.data)+'" download="'+ea(m.file.name||"file")+'" style="color:var(--accent)">پیوست خراب — دریافت فایل</a>'};
+      })(mediaEls[mi])}
+      var dlA=document.createElement("a");
+      dlA.className="btn small";dlA.style.marginTop="6px";dlA.style.display="inline-block";
+      dlA.textContent="دانلود";dlA.setAttribute("download","میم‌چت");
+      dlA.href=m.file.data;f.appendChild(dlA);
     }
-    else if(ft.indexOf("audio")===0){f.innerHTML='<div style="display:flex;align-items:center;gap:6px;max-width:260px"><audio src="'+ea(m.file.data)+'" controls preload="metadata" style="flex:1;min-width:0;height:44px"></audio><button type="button" class="btn small" style="margin-top:0" onclick="var a=this.parentElement.querySelector(\'audio\');a.paused?a.play():a.pause()">پخش</button><button type="button" class="btn small" style="margin-top:0" onclick="mcSpeed(this)">1x</button></div>'}
-    else if(ft.indexOf("image")===0){f.innerHTML='<img src="'+ea(m.file.data)+'" class="msgImg" style="max-width:220px;max-height:300px;object-fit:cover;border-radius:10px;cursor:zoom-in" onclick="mcImageView(this.src)" alt="">'}
-    else{f.innerHTML='<a href="'+ea(m.file.data)+'" download="'+ea(m.file.name||"file")+'" style="color:var(--accent)">دانلود '+esc(m.file.name||"فایل")+'</a>'}
-    var mediaEls=f.querySelectorAll("img,video,audio");
-    for(var mi=0;mi<mediaEls.length;mi++){(function(el){
-      el.onerror=function(){f.innerHTML='<a href="'+ea(m.file.data)+'" download="'+ea(m.file.name||"file")+'" style="color:var(--accent)">پیوست خراب — دریافت فایل</a>'};
-    })(mediaEls[mi])}
-    var dlA=document.createElement("a");
-    dlA.className="btn small"; dlA.style.marginTop="6px"; dlA.style.display="inline-block";
-    dlA.textContent="دانلود"; dlA.setAttribute("download","میم‌چت");
-    dlA.href=m.file.data;
-    f.appendChild(dlA);
     b.appendChild(f);
   }
   var meta=document.createElement("div");meta.className="meta";
   if(m.edited)meta.innerHTML+="<span>ویرایش‌شده</span>";
   meta.innerHTML+="<span>"+fmtTime(m.ts||Date.now())+"</span>";
-  b.appendChild(meta);
-  var rb=document.createElement("div");rb.className="reacts";drawReacts(rb,m.reactions||{});b.appendChild(rb);
+  var rb=document.createElement("div");rb.className="reacts";drawReacts(rb,m.reactions||{});
+  if(mediaVisual){
+    var info=document.createElement("div");info.className="mcMediaInfo";
+    info.appendChild(t);
+    var nm=b.querySelector(".nmline");if(nm)info.appendChild(nm);
+    if(m.username&&m.fromId){
+      var handle=document.createElement("button");handle.type="button";handle.className="mcMediaHandle";
+      handle.textContent="@"+m.username;
+      handle.onclick=function(ev){ev.stopPropagation();who(m)};
+      info.appendChild(handle);
+    }
+    info.appendChild(rb);
+    var foot=document.createElement("div");foot.className="mcMediaFoot";
+    foot.appendChild(meta);if(visualDownload)foot.appendChild(visualDownload);
+    info.appendChild(foot);b.appendChild(info);
+  }else{b.appendChild(meta);b.appendChild(rb)}
   if(m.buttons&&m.buttons.length){
     var bb=document.createElement("div");bb.className="botBtns";
     m.buttons.forEach(function(bt){
@@ -2973,8 +3104,12 @@ function mergeMessages(list, mode) {
     if (!m || !m.id) return;
     if (MSG.byId[m.id]) {
       var prev = MSG.byId[m.id];
+      /* پول، فایل را فقط با متادیتا می‌فرستد؛ پیش‌نمایش دریافت‌شده را با واکنش/ویرایش از دست نده. */
+      if(prev.file&&prev.file.data&&m.file&&m.file.pending&&!m.file.data)m.file=prev.file;
+      if(prev.__fileLoading){m.__fileLoading=true;m.__fileLoadPromise=prev.__fileLoadPromise}
       if ((prev.text !== m.text) || (JSON.stringify(prev.reactions || {}) !== JSON.stringify(m.reactions || {}))) {
         MSG.byId[m.id] = m;
+        var mi=MSG.list.indexOf(prev);if(mi>=0)MSG.list[mi]=m;
         updateBubble(m);
       }
       return;
@@ -3130,18 +3265,22 @@ function mcJumpFromBar() { if (reply && reply.id) jumpToMsg(reply.id); }
 /* رسانهٔ پیام: پول فقط متادیتا می‌فرستد — اینجا یک‌بار کامل می‌گیریم */
 function mcLoadMsgFile(id) {
   var m = MSG.byId[id];
-  if (!m || !m.file || m.file.data || m.__fileLoading) return Promise.resolve(!!(m && m.file && m.file.data));
+  if (!m || !m.file || m.file.data) return Promise.resolve(!!(m && m.file && m.file.data));
+  if(m.__fileLoading)return m.__fileLoadPromise||Promise.resolve(false);
   m.__fileLoading = true;
-  return api("/api/chat?action=message-file&id=" + encodeURIComponent(id), { noCache: true }).then(function (r) {
-    m.__fileLoading = false;
+  m.__fileLoadPromise=api("/api/chat?action=message-file&id=" + encodeURIComponent(id), { noCache: true }).then(function (r) {
+    var current=MSG.byId[id]||m;
+    m.__fileLoading=false;current.__fileLoading=false;
+    m.__fileLoadPromise=null;current.__fileLoadPromise=null;
     if (r.ok && r.data && r.data.success && r.data.file) {
-      m.file = r.data.file;
+      m.file=r.data.file;current.file=r.data.file;
       var e = msgs[id];
-      if (e && e.el && e.el.parentNode) { e.el.parentNode.removeChild(e.el); delete msgs[id]; insertBubble(m); }
+      if (e && e.el && e.el.parentNode) { e.el.parentNode.removeChild(e.el); delete msgs[id]; insertBubble(current); }
       return true;
     }
     return false;
-  }).catch(function () { m.__fileLoading = false; return false; });
+  }).catch(function () {m.__fileLoading=false;m.__fileLoadPromise=null;var now=MSG.byId[id];if(now){now.__fileLoading=false;now.__fileLoadPromise=null}return false});
+  return m.__fileLoadPromise;
 }
 function mcEndScroll() {
   var b = $("msgs"), j = $("jumpEnd");
@@ -5860,7 +5999,17 @@ function mcIco(k, cls) {
     save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/>',
     folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
     plus: '<path d="M12 5v14M5 12h14"/>',
-    back: '<path d="M15 18l-6-6 6-6"/>'
+    back: '<path d="M15 18l-6-6 6-6"/>',
+    pause: '<path d="M8 4v16M16 4v16" stroke-width="3"/>',
+    volume: '<path d="M4 9v6h4l5 4V5L8 9zM17 9a5 5 0 0 1 0 6M20 6a9 9 0 0 1 0 12"/>',
+    muted: '<path d="M4 9v6h4l5 4V5L8 9zM17 9l5 6M22 9l-5 6"/>',
+    more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
+    download: '<path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/>',
+    gallery: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    eye: '<path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/>',
+    external: '<path d="M13 5h6v6M19 5l-9 9M18 14v5H5V6h5"/>',
+    share: '<circle cx="18" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><path d="M7 11l9-5M7 13l9 5"/>',
+    speed: '<path d="M4 17a9 9 0 1 1 16 0M12 13l5-5M9 20h6"/>'
   }[k] || "";
   return '<svg class="' + (cls || "ic") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + p + "</svg>";
 }
@@ -6138,6 +6287,231 @@ function mcImageView(src) {
   };
   document.body.appendChild(el);
 }
+
+/* رسانهٔ پیام: کارت بزرگ و پلیر تمام‌صفحه؛ بدون دست‌زدن به پروفایل/صوت/ویدیوی دایره‌ای */
+var MC_MEDIA_VIEW=null,MC_MEDIA_GALLERY=null,MC_MEDIA_SUPPRESS_POP=false;
+function mcMediaMessage(id){return (MSG&&MSG.byId&&MSG.byId[id])||(msgs[id]&&msgs[id].m)||null}
+function mcMediaClock(s){
+  s=Math.max(0,Math.floor(Number(s)||0));
+  var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  return (h?h+":"+String(m).padStart(2,"0"):String(m))+":"+String(sec).padStart(2,"0");
+}
+function mcMediaWhen(ts){
+  try{return new Date(Number(ts)||Date.now()).toLocaleString(SET&&SET.digits==="fa"?"fa-IR":"en-GB",
+    {year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})}
+  catch(e){return fmtTime(ts)}
+}
+function mcMediaName(m){
+  var type=(m&&m.file&&m.file.type)||"";
+  return String((m&&m.file&&m.file.name)||("mimchat-media."+(type.indexOf("video/")===0?"webm":"jpg")))
+    .replace(/[\\/:*?"<>|\x00-\x1f]/g,"_").slice(0,140);
+}
+function mcMediaBlob(id){
+  var m=mcMediaMessage(id),data=m&&m.file&&m.file.data;
+  var hit=typeof data==="string"&&data.match(/^data:([^;,]+);base64,/i);
+  if(!hit||!/^(image|video)\//i.test(hit[1]))throw Error("رسانه در دسترس نیست");
+  var binary=atob(data.slice(hit[0].length)),bytes=new Uint8Array(binary.length);
+  for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return {blob:new Blob([bytes],{type:hit[1]}),name:mcMediaName(m)};
+}
+function mcMediaNavBack(steps){
+  if(!steps)return;
+  MC_MEDIA_SUPPRESS_POP=true;
+  try{history.go(-steps);setTimeout(function(){MC_MEDIA_SUPPRESS_POP=false},1800)}
+  catch(e){MC_MEDIA_SUPPRESS_POP=false}
+}
+function mcMediaClose(fromPop){
+  var state=MC_MEDIA_VIEW;
+  if(!state)return;
+  MC_MEDIA_VIEW=null;
+  if(state.video)try{state.video.pause()}catch(e){}
+  state.el.remove();
+  if(state.focus&&state.focus.isConnected)try{state.focus.focus({preventScroll:true})}catch(e){}
+  if(!fromPop&&state.pushed)mcMediaNavBack(1);
+}
+function mcMediaGalleryClose(fromPop){
+  var state=MC_MEDIA_GALLERY;
+  if(!state)return;
+  MC_MEDIA_GALLERY=null;state.el.remove();
+  if(state.focus&&state.focus.isConnected)try{state.focus.focus({preventScroll:true})}catch(e){}
+  if(!fromPop&&state.pushed)mcMediaNavBack(1);
+}
+function mcMediaMenuItem(icon,label,action){
+  return '<button type="button" data-mc-act="'+action+'">'+mcIco(icon)+'<span>'+label+'</span></button>';
+}
+async function mcMediaOpen(id){
+  var m=mcMediaMessage(id);
+  if(!m||!m.file){toast("رسانه پیدا نشد");return}
+  if(!m.file.data){
+    var ok=await mcLoadMsgFile(id);
+    m=mcMediaMessage(id);
+    if(!ok||!m||!m.file||!m.file.data){toast("بارگیری رسانه ناموفق بود؛ دوباره تلاش کن");return}
+  }
+  var type=String(m.file.type||((m.file.data||"").match(/^data:([^;]+)/)||[])[1]||"");
+  var video=/^video\//.test(type);
+  if(!video&&!/^image\//.test(type)){toast("این فایل عکس یا ویدیو نیست");return}
+  var old=MC_MEDIA_VIEW,pushed=false;
+  if(old){pushed=old.pushed;mcMediaClose(true)}
+  else try{history.pushState({mcMediaViewer:true},"",location.href);pushed=true}catch(e){}
+  var focus=document.activeElement;
+  var el=document.createElement("div");el.className="mcMediaViewer";
+  el.id="mcMediaViewer";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");
+  el.setAttribute("aria-label",video?"پلیر ویدیو":"نمایش عکس");
+  el.innerHTML='<div class="mcMvTop">'+
+    '<button type="button" class="mcMvBtn mcMvBack" aria-label="برگشت">'+mcIco("back")+'</button>'+
+    '<div class="mcMvTopInfo"><div class="mcMvTitle">'+esc(m.name||"میم‌چت")+'</div><div class="mcMvSub">'+esc(mcMediaWhen(m.ts))+'</div></div>'+
+    '<button type="button" class="mcMvBtn mcMvMore" aria-label="گزینه‌های بیشتر" aria-expanded="false">'+mcIco("more")+'</button></div>'+
+    '<div class="mcMvStage"></div>'+
+    '<div class="mcMvBottom"><div class="mcMvCaption"></div><div class="mcMvAuthor"></div>'+
+    (video?'<div class="mcMvControls">'+
+       '<button type="button" class="mcMvBtn mcMvToggle" aria-label="پخش">'+mcIco("play")+'</button>'+
+       '<span class="mcMvClock mcMvElapsed">0:00</span><input type="range" class="mcMvSeek" min="0" max="1000" value="0" aria-label="موقعیت پخش">'+
+       '<span class="mcMvClock mcMvTotal">0:00</span>'+
+       '<button type="button" class="mcMvBtn mcMvMute" aria-label="بی‌صدا کردن">'+mcIco("volume")+'</button></div>':'')+'</div>'+
+    '<div class="mcMvMenu" hidden role="menu">'+
+      (video?mcMediaMenuItem("speed","سرعت پخش: 1x","speed")+
+      '<div class="mcMvSpeedList" hidden><button type="button" data-mc-rate="0.5">0.5x</button><button type="button" class="on" data-mc-rate="1">1x</button><button type="button" data-mc-rate="1.5">1.5x</button><button type="button" data-mc-rate="2">2x</button></div>':"")+
+      mcMediaMenuItem("external","باز کردن بیرون از برنامه","open")+
+      mcMediaMenuItem("gallery","همهٔ رسانه‌ها","gallery")+
+      mcMediaMenuItem("chat","نمایش در گفتگو","chat")+
+      mcMediaMenuItem("share","اشتراک‌گذاری","share")+
+      mcMediaMenuItem("download","ذخیره در دستگاه","save")+'</div>';
+  var caption=fmt(m.text);
+  el.querySelector(".mcMvCaption").innerHTML=mcIsCens(m.text)
+    ?'<span class="censBox" onclick="this.classList.add(\'open\')">'+caption+'</span>':caption;
+  el.querySelector(".mcMvAuthor").textContent=m.username?"@"+m.username:"";
+  var stage=el.querySelector(".mcMvStage"),media=document.createElement(video?"video":"img");
+  media.src=m.file.data;
+  if(video){
+    media.preload="metadata";media.playsInline=true;media.setAttribute("playsinline","");
+    media.disableRemotePlayback=true;media.disablePictureInPicture=true;
+    media.setAttribute("disableremoteplayback","");media.setAttribute("disablepictureinpicture","");
+    media.setAttribute("aria-label","ویدیو");
+  }else{
+    media.alt="عکس پیام";
+    media.addEventListener("error",function(){toast("فرمت این عکس پشتیبانی نشد؛ از ذخیره در دستگاه استفاده کن")});
+  }
+  stage.appendChild(media);
+  var state={el:el,video:video?media:null,id:id,pushed:pushed,focus:focus};MC_MEDIA_VIEW=state;
+  var menu=el.querySelector(".mcMvMenu"),more=el.querySelector(".mcMvMore");
+  function hideMenu(){menu.hidden=true;more.setAttribute("aria-expanded","false")}
+  el.querySelector(".mcMvBack").onclick=function(){mcMediaClose()};
+  more.onclick=function(){menu.hidden=!menu.hidden;more.setAttribute("aria-expanded",String(!menu.hidden))};
+  el.addEventListener("click",function(ev){if(!ev.target.closest(".mcMvMenu,.mcMvMore"))hideMenu()});
+  menu.onclick=function(ev){
+    var rate=ev.target.closest("button[data-mc-rate]");
+    if(rate&&video){
+      media.playbackRate=Number(rate.getAttribute("data-mc-rate"));
+      menu.querySelectorAll("[data-mc-rate]").forEach(function(b){b.classList.toggle("on",b===rate)});
+      menu.querySelector('[data-mc-act="speed"] span').textContent="سرعت پخش: "+media.playbackRate+"x";
+      hideMenu();return;
+    }
+    var btn=ev.target.closest("button[data-mc-act]");if(!btn)return;
+    var action=btn.getAttribute("data-mc-act");
+    if(action==="speed"){var speeds=menu.querySelector(".mcMvSpeedList");if(speeds)speeds.hidden=!speeds.hidden;return}
+    hideMenu();
+    if(action==="open")mcMediaOpenExternal(id);
+    else if(action==="gallery")mcMediaGallery();
+    else if(action==="chat")mcMediaShowInChat(id);
+    else if(action==="share")mcMediaShare(id);
+    else if(action==="save")mcMediaDownload(id);
+  };
+  if(video){
+    var play=el.querySelector(".mcMvToggle"),big=document.createElement("button");
+    big.type="button";big.className="mcMvBigPlay";big.setAttribute("aria-label","پخش ویدیو");big.innerHTML=mcIco("play");stage.appendChild(big);
+    var seek=el.querySelector(".mcMvSeek"),elapsed=el.querySelector(".mcMvElapsed"),total=el.querySelector(".mcMvTotal");
+    function redraw(){var length=media.duration;elapsed.textContent=mcMediaClock(media.currentTime);
+      total.textContent=isFinite(length)?mcMediaClock(length):"0:00";
+      seek.value=isFinite(length)&&length>0?String(Math.round(media.currentTime/length*1000)):"0";
+      seek.disabled=!(isFinite(length)&&length>0)}
+    function toggle(){if(media.paused){var p=media.play();if(p&&p.catch)p.catch(function(){toast("ویدیو پخش نشد؛ می‌تونی دانلودش کنی")})}else media.pause()}
+    play.onclick=toggle;big.onclick=toggle;media.onclick=toggle;
+    seek.oninput=function(){if(isFinite(media.duration)&&media.duration>0)media.currentTime=Number(seek.value)/1000*media.duration};
+    el.querySelector(".mcMvMute").onclick=function(){media.muted=!media.muted;this.innerHTML=mcIco(media.muted?"muted":"volume");this.setAttribute("aria-label",media.muted?"روشن کردن صدا":"بی‌صدا کردن")};
+    media.addEventListener("play",function(){el.classList.add("isPlaying");play.innerHTML=mcIco("pause");play.setAttribute("aria-label","مکث")});
+    media.addEventListener("pause",function(){el.classList.remove("isPlaying");play.innerHTML=mcIco("play");play.setAttribute("aria-label","پخش")});
+    media.addEventListener("timeupdate",redraw);media.addEventListener("loadedmetadata",redraw);media.addEventListener("durationchange",redraw);
+    media.addEventListener("error",function(){if(MC_MEDIA_VIEW===state)toast("فرمت این ویدیو پشتیبانی نشد؛ از ذخیره در دستگاه استفاده کن")});
+    redraw();
+  }
+  document.body.appendChild(el);
+  el.querySelector(".mcMvBack").focus({preventScroll:true});
+}
+function mcMediaShowInChat(id){
+  var steps=(MC_MEDIA_VIEW&&MC_MEDIA_VIEW.pushed?1:0)+(MC_MEDIA_GALLERY&&MC_MEDIA_GALLERY.pushed?1:0);
+  mcMediaClose(true);mcMediaGalleryClose(true);mcMediaNavBack(steps);
+  jumpToMsg(id);
+}
+function mcMediaGallery(){
+  var fromView=MC_MEDIA_VIEW,pushed=!!(fromView&&fromView.pushed);
+  if(fromView)mcMediaClose(true);
+  if(MC_MEDIA_GALLERY){mcMediaGalleryClose(true);pushed=true}
+  try{
+    if(pushed)history.replaceState({mcMediaGallery:true},"",location.href);
+    else{history.pushState({mcMediaGallery:true},"",location.href);pushed=true}
+  }catch(e){pushed=false}
+  var focus=document.activeElement,el=document.createElement("div");el.className="mcMediaGallery";el.id="mcMediaGallery";
+  el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","رسانه‌های گفتگو");
+  el.innerHTML='<div class="mcMvTop"><button type="button" class="mcMvBtn mcGalBack" aria-label="برگشت">'+mcIco("back")+'</button>'+
+    '<div class="mcMvTopInfo"><div class="mcMvTitle">رسانه‌های '+esc(chat&&chat.name||"گفتگو")+'</div><div class="mcMvSub">عکس‌ها و ویدیوهای بارگذاری‌شده در این گفتگو</div></div></div>'+
+    '<div class="mcMediaGalleryGrid"></div><button type="button" class="mcMediaGalleryMore" hidden>پیام‌های قدیمی‌تر را بارگذاری کن</button>';
+  var grid=el.querySelector(".mcMediaGalleryGrid"),older=el.querySelector(".mcMediaGalleryMore");
+  function render(){
+    grid.innerHTML="";
+    var found=(MSG&&MSG.list||[]).map(function(item){return MSG.byId[item.id]||item})
+      .filter(function(item){return item&&item.file&&/^(image|video)\//.test(String(item.file.type||""))})
+      .sort(function(a,b){return (b.ts||0)-(a.ts||0)});
+    found.forEach(function(item){
+      var btn=document.createElement("button");btn.type="button";btn.setAttribute("data-message-id",String(item.id));
+      var isVideo=/^video\//.test(item.file.type||"");
+      btn.setAttribute("aria-label",(isVideo?"ویدیو":"عکس")+" از "+(item.name||"کاربر"));
+      if(item.file.data){
+        var thumb=document.createElement(isVideo?"video":"img");thumb.src=item.file.data;
+        if(isVideo){thumb.muted=true;thumb.preload="metadata";thumb.playsInline=true}
+        else thumb.alt="";
+        btn.appendChild(thumb);
+      }else btn.innerHTML=mcIco(isVideo?"video":"camera");
+      if(isVideo){var badge=document.createElement("span");badge.className="mcGalPlay";badge.innerHTML=mcIco("play");btn.appendChild(badge)}
+      btn.onclick=function(){mcMediaOpen(item.id)};grid.appendChild(btn);
+    });
+    older.hidden=!(MSG&&MSG.hasMore);
+  }
+  older.onclick=async function(){older.disabled=true;await loadOlder();older.disabled=false;render()};
+  el.querySelector(".mcGalBack").onclick=function(){mcMediaGalleryClose()};
+  MC_MEDIA_GALLERY={el:el,pushed:pushed,focus:focus};document.body.appendChild(el);
+  render();el.querySelector(".mcGalBack").focus({preventScroll:true});
+}
+function mcMediaDownload(id){
+  try{
+    var file=mcMediaBlob(id),url=URL.createObjectURL(file.blob),a=document.createElement("a");
+    a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},60000);
+  }catch(e){toast("دانلود این رسانه ممکن نشد")}
+}
+function mcMediaOpenExternal(id){
+  try{
+    var file=mcMediaBlob(id);
+    /* SVG در تب مستقل می‌تواند کد اجرا کند؛ پیش‌نمایش داخل img امن است، تب مستقل نه. */
+    if(/^image\/svg\+xml$/i.test(file.blob.type)){toast("برای امنیت، فایل SVG را دانلود کن");return}
+    var url=URL.createObjectURL(file.blob),a=document.createElement("a");
+    a.href=url;a.target="_blank";a.rel="noopener noreferrer";document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},60000);
+  }catch(e){toast("باز کردن این رسانه ممکن نشد")}
+}
+async function mcMediaShare(id){
+  try{
+    var file=mcMediaBlob(id),asset=new File([file.blob],file.name,{type:file.blob.type});
+    if(!navigator.share||navigator.canShare&&!navigator.canShare({files:[asset]})){
+      toast("اشتراک‌گذاری فایل در این مرورگر پشتیبانی نمی‌شود؛ از ذخیره استفاده کن");return;
+    }
+    await navigator.share({files:[asset],title:"رسانهٔ میم‌چت"});
+  }catch(e){if(!e||e.name!=="AbortError")toast("اشتراک‌گذاری این رسانه انجام نشد")}
+}
+document.addEventListener("keydown",function(ev){
+  if(ev.key!=="Escape")return;
+  if(MC_MEDIA_VIEW){var menu=MC_MEDIA_VIEW.el.querySelector(".mcMvMenu");if(menu&&!menu.hidden){menu.hidden=true;ev.preventDefault();return}mcMediaClose();ev.preventDefault()}
+  else if(MC_MEDIA_GALLERY){mcMediaGalleryClose();ev.preventDefault()}
+});
 function mcMsgUser(id) {
   mcSheetClose();
   doNewPV(id);
@@ -7047,6 +7421,9 @@ window.attachSheet = function () {
 
 /* دکمه برگشت اندروید = قطع تماس */
 window.addEventListener("popstate", function () {
+  if (MC_MEDIA_SUPPRESS_POP) { MC_MEDIA_SUPPRESS_POP = false; return; }
+  if (MC_MEDIA_VIEW) { mcMediaClose(true); return; }
+  if (MC_MEDIA_GALLERY) { mcMediaGalleryClose(true); return; }
   if (call && call.active) { callHangup(); return; }
   if ($("mcSheet") && $("mcSheet").style.display !== "none") { mcSheetClose(); return; }
 });
