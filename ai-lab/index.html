@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#101011" />
+  <meta name="description" content="آزمایشگاه مستقل هوش مصنوعی محلی MemeChat؛ مدل در مرورگر شما اجرا می‌شود، نه روی سرور گیت‌هاب." />
+  <title>آزمایشگاه هوش مصنوعی محلی | MemeChat</title>
+  <script type="module" crossorigin src="./assets/index-67UDwidS.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-D_OS6xB4.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="../" aria-label="بازگشت به MemeChat">
+          <span class="brand-icon" aria-hidden="true">M</span>
+          <span class="brand-text">Meme<span>Chat</span><small>AI LAB</small></span>
+        </a>
+        <div class="topbar-right">
+          <span class="tag">نمونهٔ مستقل و آزمایشی</span>
+          <a class="back-link" href="../"><span aria-hidden="true">↗</span> بازگشت به چت اصلی</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <section class="workspace" aria-label="گفت‌وگوی آزمایشی">
+        <div class="hero">
+          <div class="eyebrow"><span class="eyebrow-line"></span> هوش مصنوعی، روی دستگاه شما</div>
+          <h1>یک گفت‌وگوی <em>واقعی،</em><br />بدون سرورِ پاسخ‌گو.</h1>
+          <p>این یک آزمایش جدا از MemeChat است. مدل از اینترنت دریافت می‌شود و فقط در مرورگر شما پاسخ می‌سازد؛ هیچ پیام چت به سرویس هوش مصنوعی ارسال نمی‌شود.</p>
+          <div class="hero-pills"><span><i class="pill-dot"></i> اجرای محلی با WebGPU</span><span><i class="pill-dot hollow"></i> بدون سهمیهٔ درخواستِ ارائه‌دهنده</span></div>
+        </div>
+
+        <div class="chat-panel">
+          <div class="panel-header">
+            <div class="panel-title"><span class="panel-icon" aria-hidden="true">✳</span><div><strong>زمین بازی مدل</strong><small>Qwen3 · 0.6B · حالت بدون فکر کردن</small></div></div>
+            <button class="ghost-button" type="button" id="clearButton" disabled title="فقط پیام‌های این آزمایش پاک می‌شوند">گفت‌وگوی تازه <span aria-hidden="true">↺</span></button>
+          </div>
+          <div class="chat-messages" id="messages" role="log" aria-label="پیام‌های همین صفحه">
+            <div class="empty-chat" id="emptyChat">
+              <div class="orb" aria-hidden="true"><span>✳</span></div>
+              <strong>برای شروع، مدل را بارگذاری کنید.</strong>
+              <p>بعد از بارگذاری می‌توانید آزادانه به فارسی گفت‌وگو کنید. پاسخ‌ها از یک مدل واقعی تولید می‌شوند؛ کیفیت فارسی این نسخهٔ کوچک تضمین‌شده نیست.</p>
+            </div>
+          </div>
+          <div class="composer-area">
+            <div class="suggestions" aria-label="پیشنهاد سؤال">
+              <button type="button" class="suggestion" data-prompt="سلام! خودت را در دو جمله معرفی کن." disabled>معرفی کوتاه <span aria-hidden="true">↗</span></button>
+              <button type="button" class="suggestion" data-prompt="یک پیام تبریک تولد دوستانه به فارسی برای سارا بنویس." disabled>تبریک تولد <span aria-hidden="true">↗</span></button>
+              <button type="button" class="suggestion" data-prompt="برای بهتر شدن تمرکز هنگام درس خواندن یک پیشنهاد ساده بده." disabled>یک پیشنهاد <span aria-hidden="true">↗</span></button>
+            </div>
+            <form id="chatForm" class="composer">
+              <label class="sr-only" for="chatInput">پیام شما</label>
+              <textarea id="chatInput" rows="1" maxlength="1200" placeholder="اول مدل را بارگذاری کنید…" disabled></textarea>
+              <button id="sendButton" type="submit" disabled aria-label="ارسال پیام" title="ارسال پیام"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 3-7.4 18-3.4-7.2L3 10.4 21 3Z"/><path d="M10.2 13.8 21 3"/></svg></button>
+              <button id="stopButton" class="stop-button hidden" type="button" aria-label="توقف پاسخ" title="توقف پاسخ">■</button>
+            </form>
+            <div class="composer-note"><span>گفت‌وگو فقط تا وقتی این صفحه باز است در حافظه می‌ماند.</span><span>Enter برای ارسال · Shift+Enter برای خط جدید</span></div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side-panel" aria-label="اطلاعات مدل و وضعیت دستگاه">
+        <div class="side-card model-card">
+          <div class="card-label"><span class="label-dot"></span> مدل آزمایشی</div>
+          <div class="model-heading"><span class="model-symbol" aria-hidden="true">✳</span><div><strong>Qwen3 <span>0.6B</span></strong><small>نسخهٔ کم‌حجمِ چندزبانه</small></div></div>
+          <div class="spec-row"><span>فرمت</span><strong>ONNX · q4f16</strong></div>
+          <div class="spec-row"><span>دانلود اول</span><strong>حدود ۵۸۰ مگابایت</strong></div>
+          <div class="spec-row"><span>محل اجرا</span><strong>مرورگر شما</strong></div>
+          <div class="spec-row"><span>مجوز مدل اصلی</span><strong>Apache-2.0</strong></div>
+          <p class="model-disclaimer">آزمایش محلی CPU با وزن دیگری از همین مدل، فارسیِ ضعیف و گاهی نادرست تولید کرد. نتیجهٔ WebGPU و کیفیت این وزنِ ۴بیتی هنوز روی دستگاه واقعی تأیید نشده است.</p>
+          <a class="source-link" href="https://huggingface.co/onnx-community/Qwen3-0.6B-ONNX" target="_blank" rel="noopener noreferrer">صفحهٔ عمومی مدل و فایل‌ها <span aria-hidden="true">↗</span></a>
+        </div>
+
+        <div class="side-card status-card">
+          <div class="card-label"><span class="label-dot neutral"></span> وضعیت راه‌اندازی</div>
+          <div class="device-row"><span class="status-icon" id="gpuIcon" aria-hidden="true">◌</span><div><strong id="gpuTitle">در حال بررسی دستگاه</strong><small id="gpuDetails">وضعیت WebGPU مشخص می‌شود…</small></div></div>
+          <div class="status-divider"></div>
+          <div class="status-line"><span>وضعیت مدل</span><strong id="modelStatus">بارگذاری نشده</strong></div>
+          <div class="progress-box hidden" id="progressBox" role="status" aria-live="polite"><div class="progress-header"><span id="progressLabel">در حال دریافت…</span><span id="progressPercent">—</span></div><div class="progress-track"><span id="progressBar"></span></div><small id="progressDetails">ممکن است چند دقیقه طول بکشد.</small></div>
+          <p class="status-explain" id="statusExplain">بارگذاری فقط با انتخاب شما آغاز می‌شود. وزن مدل از Hugging Face دریافت و در حافظهٔ پنهان مرورگر ذخیره می‌شود، اگر مرورگر فضا داشته باشد.</p>
+          <button type="button" id="loadButton" class="load-button" disabled>بررسی WebGPU… <span aria-hidden="true">←</span></button>
+        </div>
+
+        <div class="side-card notice-card"><span class="notice-mark" aria-hidden="true">!</span><div><strong>پیش از آزمایش بدانید</strong><p>گیت‌هاب فقط فایل‌های این صفحه را میزبانی می‌کند؛ GPU یا سرور چت در اختیار نمی‌گذارد. دستگاه‌های بدون WebGPU یا با حافظهٔ کم ممکن است مدل را اجرا نکنند. پاسخ‌ها ممکن است غلط یا نامفهوم باشند.</p></div></div>
+        <div class="side-footnote">پیام‌ها به Supabase، GitHub یا Hugging Face ارسال نمی‌شوند؛ فقط درخواست دریافت فایل‌های عمومی مدل به Hugging Face می‌رود.</div>
+      </aside>
+    </main>
+    <footer class="page-footer"><span>© MemeChat · AI Lab</span><span>آزمایش مستقل؛ هنوز به چت اصلی متصل نیست.</span></footer>
+  </div>
+  <noscript><p style="background:#101011;color:#fff;padding:1rem;text-align:center">برای اجرای مدل در مرورگر، جاوااسکریپت لازم است.</p></noscript>
+</body>
+</html>
