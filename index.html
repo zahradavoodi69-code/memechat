@@ -1384,9 +1384,36 @@ function emojiPicker(onPick) {
 /* ===== app ===== */
 
 "use strict";
-var MAIN="chat-mcc-kowa-v1",PV_KEY="mimchat_pv_v3";
+var MAIN="chat-mcc-kowa-v1",PV_BASE_KEY="mimchat_pv_v3",PV_KEY=PV_BASE_KEY;
+var MC_SEEN_KEY="mc_seen",MC_MEN_KEY="mc_men",MC_ACCOUNT_OWNER_KEY="mimchat_local_owner_v1";
 var me=null,rooms=[],dir=[],msgs={},chat=null,inChat=false,pv=[],reply=null,editId=null,timer=null,busy=false,otpEmail="",flushing=false;
-try{pv=JSON.parse(localStorage.getItem(PV_KEY)||"[]")}catch(e){pv=[]}
+/* Local PVs, mentions, read markers and saved code belong to the signed-in account.
+   Keep legacy values intact; migrate them once for the first verified account. */
+function mcUseAccountStorage(u){
+  var id=String((u&&u.id)||"");
+  pv=[];
+  if(!id)return;
+  var suffix="_"+encodeURIComponent(id);
+  PV_KEY=PV_BASE_KEY+suffix;
+  MC_SEEN_KEY="mc_seen"+suffix;
+  MC_MEN_KEY="mc_men"+suffix;
+  if(typeof MC_CODE_KEY!=="undefined") MC_CODE_KEY="mimchat_bayterry_code_v1"+suffix;
+  try{
+    var owner=localStorage.getItem(MC_ACCOUNT_OWNER_KEY)||"";
+    if(!owner)localStorage.setItem(MC_ACCOUNT_OWNER_KEY,id);
+    if(!owner||owner===id){
+      [[PV_BASE_KEY,PV_KEY],["mc_seen",MC_SEEN_KEY],["mc_men",MC_MEN_KEY],
+       ["mimchat_bayterry_code_v1","mimchat_bayterry_code_v1"+suffix]].forEach(function(pair){
+        if(localStorage.getItem(pair[1])===null){
+          var old=localStorage.getItem(pair[0]);
+          if(old!==null)localStorage.setItem(pair[1],old);
+        }
+      });
+    }
+    var list=JSON.parse(localStorage.getItem(PV_KEY)||"[]");
+    pv=Array.isArray(list)?list:[];
+  }catch(e){pv=[]}
+}
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 function ea(s){return esc(s).replace(/'/g,"&#39;")}
@@ -1407,14 +1434,17 @@ async function api(p,o){
   o=o||{};
   p = (window.MC_API || "") + p;
   var method=(o.method||"GET").toUpperCase();
+  var token="";try{token=localStorage.getItem("mc_token")||""}catch(e){}
   var volatile = p.indexOf("action=poll")>=0 || p.indexOf("action=history")>=0 || p.indexOf("action=rt-")>=0;
   var useCache = method==="GET" && !volatile && !o.noCache;
-  if(useCache && MH.cache[p] && (Date.now()-MH.cache[p].t) < 30000) return MH.cache[p].v;
-  var key = method+" "+p;
+  /* Cache and in-flight requests must never be shared between accounts. */
+  var cacheKey=p+"\n"+token;
+  if(useCache && MH.cache[cacheKey] && (Date.now()-MH.cache[cacheKey].t) < 30000) return MH.cache[cacheKey].v;
+  var key = method+" "+cacheKey;
   if(MH.inflight[key]) return MH.inflight[key];
   var job = (async function(){
     var q={method:method,credentials:"same-origin",headers:{Accept:"application/json"}};
-    try{ var _tok=localStorage.getItem("mc_token"); if(_tok) q.headers["Authorization"]="Bearer "+_tok; }catch(e){}
+    if(token)q.headers["Authorization"]="Bearer "+token;
     if(o.body!==undefined){q.headers["Content-Type"]="application/json";q.body=JSON.stringify(o.body)}
     if(o.signal)q.signal=o.signal;
     if(o.timeout&&typeof AbortController!=="undefined"&&!q.signal){
@@ -1430,7 +1460,7 @@ async function api(p,o){
     var d={};
     try{d=await r.json()}catch(e){}
     var out={ok:r.ok,status:r.status,data:d};
-    if(useCache&&out.ok) MH.cache[p]={t:Date.now(),v:out};
+    if(useCache&&out.ok) MH.cache[cacheKey]={t:Date.now(),v:out};
     if(method!=="GET") MH.cache={};
     return out;
   })();
@@ -1537,6 +1567,7 @@ async function doLogin(){
 }
 function enter(u){
   me=u;
+  mcUseAccountStorage(u);
   var sp=$("bootSplash");if(sp)sp.remove();
   $("login").style.display="none";$("app").style.display="flex";
   $("app").classList.remove("mcPVChatActive");
@@ -1865,7 +1896,7 @@ async function mcMentionPop(){
       if (peerU) cands = [{ username: peerU, name: "" }];
     }
   } catch (e) {}
-  var prev = []; try { prev = JSON.parse(localStorage.getItem("mc_men") || "[]"); } catch (e) {}
+  var prev = []; try { prev = JSON.parse(localStorage.getItem(MC_MEN_KEY) || "[]"); } catch (e) {}
   prev.forEach(function(u){ if (!cands.some(function(c){ return String(c.username).toLowerCase() === u; })) cands.push({ username: u, name: "" }); });
   var seen = {}, out = [];
   for (var j = 0; j < cands.length && out.length < 8; j++) {
@@ -1992,7 +2023,7 @@ async function toggleVoice(){
 function mcUnseen(topic){
   try{
     if(!topic) return false;
-    var seen=JSON.parse(localStorage.getItem("mc_seen")||"{}");
+    var seen=JSON.parse(localStorage.getItem(MC_SEEN_KEY)||"{}");
     var latest=(window.CHAT_LATEST||{})[topic]||0;
     return latest > (seen[topic]||0);
   }catch(e){ return false; }
@@ -3567,7 +3598,7 @@ async function sendMsg() {
   }
   if(/^\/memechat\s+set\s+font\s+minecraft$/i.test(t)){SET.font="minecraft";saveSettings();toast("فونت ماینکرفتی فعال شد")}
   else if(/^\/memechat\s+reset\s+font$/i.test(t)){SET.font="normal";saveSettings();toast("فونت به حالت عادی برگشت")}
-  try{ if(/@[a-z0-9_.]{3,20}/i.test(t)){ var men=JSON.parse(localStorage.getItem("mc_men")||"[]"); t.replace(/@([a-z0-9_.]{3,20})/gi,function(_,u){var k=u.toLowerCase();if(men.indexOf(k)<0)men.push(k)}); men=men.slice(-40); localStorage.setItem("mc_men",JSON.stringify(men)); } }catch(e){}
+  try{ if(/@[a-z0-9_.]{3,20}/i.test(t)){ var men=JSON.parse(localStorage.getItem(MC_MEN_KEY)||"[]"); t.replace(/@([a-z0-9_.]{3,20})/gi,function(_,u){var k=u.toLowerCase();if(men.indexOf(k)<0)men.push(k)}); men=men.slice(-40); localStorage.setItem(MC_MEN_KEY,JSON.stringify(men)); } }catch(e){}
   var cid = newCid();
   var body = {
     topic: chat.topic, text: t, cid: cid,
@@ -3639,7 +3670,7 @@ function open(type, id, title, topic) {
   if (cb) cb.style.display = type === "pv" ? "" : "none";
   $("msgIn").focus();
   netBar("");
-  try{ var seen0=JSON.parse(localStorage.getItem("mc_seen")||"{}"); seen0[topic]=Date.now(); localStorage.setItem("mc_seen",JSON.stringify(seen0)); }catch(e){}
+  try{ var seen0=JSON.parse(localStorage.getItem(MC_SEEN_KEY)||"{}"); seen0[topic]=Date.now(); localStorage.setItem(MC_SEEN_KEY,JSON.stringify(seen0)); }catch(e){}
   poll(true);
 }
 
@@ -7979,12 +8010,24 @@ async function mcDoCreateAccount(){
 async function mcSwitchTo(id){
   if (!confirm("به این اکانت سوییچ شود؟")) return;
   var r = await api("/api/chat?action=profile", { method:"POST", body:{ subAction:"switch-account", id: id } });
-  if (r.ok && r.data && r.data.success) {
-    toast("سوییچ انجام شد — در حال بازنشانی…");
-    setTimeout(function () { location.reload(); }, 900);
-  } else {
+  if (!r.ok || !r.data || !r.data.success) {
     toast((r.data && r.data.error) || "سوییچ نشد");
+    return;
   }
+  /* The Pages frontend authenticates via localStorage Bearer, not the Edge cookie. */
+  if (typeof r.data.token !== "string" || !r.data.token || !r.data.user || String(r.data.user.id) !== String(id)) {
+    toast("پاسخ سوییچ کامل نیست؛ حساب قبلی حفظ شد");
+    return;
+  }
+  try {
+    localStorage.setItem("mc_token", r.data.token);
+    if (localStorage.getItem("mc_token") !== r.data.token) throw new Error("token not stored");
+  } catch (e) {
+    toast("ذخیرهٔ نشست جدید ممکن نشد؛ حساب قبلی حفظ شد");
+    return;
+  }
+  stopPolling();
+  location.reload();
 }
 
 /* ===== v1.4.4 — به‌روزرسانی خودکار وب در APK (بدون اپدیت دستی نرم‌افزار) ===== */
