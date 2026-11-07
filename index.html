@@ -227,6 +227,15 @@ button.ghost{background:var(--input);color:var(--text);border:1px solid #3d3428}
 #modal .sheet.mcStorySheet .mcStoryReplyRow input{flex:1;min-width:0;width:auto;max-width:none;margin:0;padding:10px 12px;font-size:.82rem}
 #modal .sheet.mcStorySheet .mcStoryReplyRow button{flex:0 0 auto;width:auto;max-width:none;margin:0;padding:10px 12px;font-size:.84rem}
 #modal .sheet.mcStorySheet>button.main{flex:none}
+#modal .mcStoryInboxBtn{color:var(--gold);border-color:rgba(255,140,0,.4);white-space:nowrap}
+#modal .mcStoryInboxBtn .ic{width:16px;height:16px;vertical-align:-3px;margin-inline-end:3px}
+.mcStoryInboxList{max-height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.mcStoryInboxRow{width:100%;display:flex;align-items:center;gap:10px;text-align:right;padding:10px;
+  border:1px solid var(--line);border-radius:12px;background:var(--input);color:var(--text);cursor:pointer}
+.mcStoryInboxAva{width:36px;height:36px;flex:0 0 36px;border-radius:12px;display:grid;place-items:center;color:#fff;font-weight:bold}
+.mcStoryInboxInfo{flex:1;min-width:0}.mcStoryInboxInfo strong,.mcStoryInboxInfo small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcStoryInboxInfo small{color:var(--muted);font-size:.73rem;margin-top:2px}
+.mcStoryInboxRow>.ic{width:17px;height:17px;flex:none;color:var(--accent)}
 .mav.hastory{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
 .avbl{position:absolute;bottom:-1px;left:-1px;width:14px;height:14px;font-size:8px;padding-top:1px;border:2px solid var(--bg);border-radius:50%;line-height:1}
 .avbl88{position:absolute;bottom:4px;left:4px;width:24px;height:24px;font-size:12px;padding-top:2px;border:3px solid #141414;border-radius:50%;line-height:1}
@@ -393,28 +402,31 @@ body{background:var(--bg);font-family:Tahoma,"Segoe UI",system-ui,sans-serif}
   width:26px;height:3px;border-radius:0 0 4px 4px;background:var(--accent);box-shadow:0 0 10px rgba(255,140,0,.6)}
 .nv.on span:first-child{opacity:1}
 
-/* فقط نوار پایین شیشه‌ای است؛ بخش‌های دیگر صفحه همان تم تیرهٔ میم‌چت می‌مانند. */
-#nav{position:relative;z-index:35;align-self:stretch;flex:0 0 70px;height:70px;min-height:70px;
-  margin:0 10px calc(8px + env(safe-area-inset-bottom));padding:5px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.2);border-radius:24px;
-  background:linear-gradient(145deg,rgba(50,49,53,.78),rgba(25,24,27,.84));
-  -webkit-backdrop-filter:blur(16px) saturate(1.35);backdrop-filter:blur(16px) saturate(1.35);
-  box-shadow:0 12px 30px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.12)}
+/* امضای میم‌چت: فقط footer کمی شیشه‌ای؛ نشان فعال کاشی نارنجی است، نه کپی pill مرجع. */
+#nav{position:relative;z-index:35;align-self:stretch;flex:0 0 72px;height:72px;min-height:72px;
+  margin:0 10px calc(8px + env(safe-area-inset-bottom));padding:6px 4px;overflow:hidden;
+  border:1px solid rgba(255,143,35,.22);border-radius:18px 18px 13px 13px;
+  background:linear-gradient(115deg,rgba(28,24,22,.85),rgba(12,12,15,.81));
+  -webkit-backdrop-filter:blur(12px) saturate(1.12);backdrop-filter:blur(12px) saturate(1.12);
+  box-shadow:0 10px 28px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,209,146,.08)}
+#nav::before{content:"";position:absolute;top:0;right:16px;width:56px;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#ff8908 54%,transparent);box-shadow:0 0 12px rgba(255,140,0,.5)}
 #nav::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(135deg,rgba(255,255,255,.09),transparent 46%,rgba(255,140,0,.035))}
+  background:radial-gradient(ellipse at 85% 0%,rgba(255,130,0,.075),transparent 48%)}
 #nav .nv{position:relative;z-index:1;align-self:stretch;justify-content:center;min-width:0;
-  gap:2px;padding:5px 1px;border:1px solid transparent;border-radius:19px;
-  color:#c1bbb5;font-size:.62rem;line-height:1.25;transition:background .18s,color .18s,transform .18s}
-#nav .nv .ic{width:22px;height:22px;stroke-width:1.8}
-#nav .nv.on{color:var(--gold);border-color:rgba(255,177,89,.43);
-  background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,140,0,.13));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 3px 12px rgba(0,0,0,.16)}
-#nav .nv.on .ic{color:var(--accent);stroke-width:2}
+  gap:3px;padding:4px 1px;border:0;border-radius:0;background:none;box-shadow:none;
+  color:#a9a39d;font-size:.62rem;line-height:1.15;transition:color .18s,transform .18s}
+#nav .nv .ic{width:24px;height:24px;stroke-width:1.8;transition:background .18s,transform .18s}
+#nav .nv.on{color:#ffc67b;border:0;background:none;box-shadow:none;font-weight:700}
+#nav .nv.on .ic{width:34px;height:34px;padding:6px;border-radius:11px;
+  background:linear-gradient(145deg,#ffb13b,#f47900);color:#241307;stroke-width:2;
+  box-shadow:0 4px 14px rgba(255,120,0,.28),inset 0 1px 0 rgba(255,255,255,.4)}
 #nav .nv.on::before{display:none}
-#nav .nv:active{transform:scale(.96)}
-@media(max-width:360px){#nav{flex-basis:64px;height:64px;min-height:64px;margin-inline:6px;border-radius:21px}
-  #nav .nv{font-size:.56rem;gap:1px;padding:4px 0;border-radius:16px}
-  #nav .nv .ic{width:20px;height:20px}}
+#nav .nv:active{transform:translateY(1px)}
+@media(max-width:360px){#nav{flex-basis:66px;height:66px;min-height:66px;margin-inline:6px;padding:4px 2px}
+  #nav .nv{font-size:.55rem;gap:2px;padding:3px 0}
+  #nav .nv .ic{width:22px;height:22px}
+  #nav .nv.on .ic{width:31px;height:31px;padding:5px}}
 
 /* -------------------------------- لیست‌ها -------------------------------- */
 .list{padding:4px 0 8px}
@@ -1746,7 +1758,7 @@ async function viewStory(id){
     '<div style="margin-top:10px;display:flex;gap:8px">'+
     (x.userId?'<button class="btn" style="flex:1" onclick="closeModal();mcUserPopup(\''+ea(x.userId)+'\',{name:\''+ea(x.name||"")+'\'})">پروفایل</button>':"")+
     ((mineStory||staffStory)?'<button class="btn danger" style="flex:1" onclick="mcStoryDelete(\''+ea(x.id)+'\')">حذف</button>':"")+
-    '<button class="btn" style="flex:1" onclick="closeModal()">بستن</button></div>');
+    (mineStory?'<button class="btn mcStoryInboxBtn" id="stInboxBtn" style="flex:1" onclick="mcStoryInbox(\''+ea(x.id)+'\')">'+mcIco("chat")+' پاسخ‌ها</button>':'<button class="btn" style="flex:1" onclick="closeModal()">بستن</button>')+'</div>');
   var storySheet=$("modal").querySelector(".sheet");
   if(storySheet){storySheet.classList.add("mcStorySheet");if(replyRow)$("mbody").insertAdjacentHTML("afterend",replyRow)}
 }
@@ -3441,6 +3453,79 @@ async function mcStoryReply(id) {
   } catch (e) {}
   open("pv", uid || topic, title, topic);
   toast("پاسخت رفت");
+}
+var MC_STORY_RECEIVED = [], MC_STORY_RECEIVED_OWNER = "";
+var MC_STORY_INBOX_SYNC_AT = 0, MC_STORY_INBOX_BUSY = false, MC_STORY_INBOX_SYNC_USER = "";
+function mcStoryMergeInbox(rows) {
+  if (!me || !Array.isArray(rows)) return;
+  var changed = false;
+  rows.forEach(function (r) {
+    if (!r || !r.topic || !r.fromId || String(r.fromId) === String(me.id) ||
+      String(r.topic).indexOf(MAIN + "-pv-") !== 0) return;
+    var p = pv.find(function (v) { return v.topic === r.topic; });
+    var last = Number(r.ts) || 0;
+    if (!p) {
+      pv.push({ topic: r.topic, targetId: r.fromId, title: r.name || r.username || "کاربر",
+        username: r.username || "", last: last });
+      changed = true;
+    } else if (last > Number(p.last || 0)) { p.last = last; changed = true; }
+  });
+  if (changed) {
+    pv = pv.slice(-60);
+    try { localStorage.setItem(PV_KEY, JSON.stringify(pv)); } catch (e) {}
+    if ($("secPV") && $("secPV").classList.contains("on")) drawPV();
+  }
+}
+/* فهرست پیوی روی دستگاه تازه هم پاسخ‌های استوریِ رسیده را پیدا می‌کند. */
+async function mcStorySyncInbox() {
+  var uid = String(me && me.id || "");
+  if (!uid) return;
+  if (MC_STORY_INBOX_SYNC_USER !== uid) {
+    MC_STORY_INBOX_SYNC_USER = uid; MC_STORY_INBOX_SYNC_AT = 0; MC_STORY_INBOX_BUSY = false;
+    MC_STORY_RECEIVED = []; MC_STORY_RECEIVED_OWNER = "";
+  }
+  if (MC_STORY_INBOX_BUSY || Date.now() - MC_STORY_INBOX_SYNC_AT < 30000) return;
+  MC_STORY_INBOX_BUSY = true;
+  try {
+    var r = await api("/api/chat?action=story-inbox", { noCache: true });
+    if (String(me && me.id) !== uid) return;
+    if (r && r.ok && r.data && r.data.success) {
+      MC_STORY_INBOX_SYNC_AT = Date.now();
+      mcStoryMergeInbox(r.data.replies || []);
+    }
+  } catch (e) {} finally { if (MC_STORY_INBOX_SYNC_USER === uid) MC_STORY_INBOX_BUSY = false; }
+}
+async function mcStoryInbox(id) {
+  var btn = $("stInboxBtn"), owner = String(me && me.id || "");
+  if (!owner || (btn && btn.disabled)) return;
+  if (btn) { btn.disabled = true; btn.textContent = "در حال دریافت…"; }
+  var r;
+  try { r = await api("/api/chat?action=story-inbox&id=" + encodeURIComponent(id), { noCache: true }); }
+  catch (e) { toast("پاسخ‌ها دریافت نشد؛ دوباره تلاش کن"); return; }
+  finally { if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = mcIco("chat") + " پاسخ‌ها"; } }
+  if (String(me && me.id) !== owner) return;
+  if (!r || !r.ok || !r.data || !r.data.success) {
+    toast((r && r.data && r.data.error) || "پاسخ‌ها دریافت نشد"); return;
+  }
+  MC_STORY_RECEIVED = Array.isArray(r.data.replies) ? r.data.replies : [];
+  MC_STORY_RECEIVED_OWNER = owner;
+  mcStoryMergeInbox(MC_STORY_RECEIVED);
+  var h = MC_STORY_RECEIVED.length ? MC_STORY_RECEIVED.map(function (x, i) {
+    var name = x.name || x.username || "کاربر";
+    return '<button type="button" class="mcStoryInboxRow" onclick="mcStoryInboxOpen(' + i + ')" aria-label="باز کردن پیوی ' + ea(name) + '">' +
+      '<span class="mcStoryInboxAva" style="background:' + col(name) + '">' + esc(String(name).charAt(0)) + '</span>' +
+      '<span class="mcStoryInboxInfo"><strong>' + esc(name) + '</strong><small>' + esc(x.text || "پاسخ به استوری") + '</small></span>' +
+      mcIco("chat") + '</button>';
+  }).join("") : '<div class="statebox">هنوز پاسخی به این استوری نرسیده است.</div>';
+  modal("پاسخ‌های استوری", '<div class="mcStoryInboxList">' + h + '</div>');
+}
+function mcStoryInboxOpen(i) {
+  if (String(me && me.id || "") !== MC_STORY_RECEIVED_OWNER) return;
+  var r = MC_STORY_RECEIVED[i];
+  if (!r || !r.topic || !r.fromId || String(r.topic).indexOf(MAIN + "-pv-") !== 0) return;
+  mcStoryMergeInbox([r]);
+  closeModal();
+  open("pv", r.fromId, r.name || r.username || "کاربر", r.topic);
 }
 function renderEmptyChat() {
   var box = $("msgs");
@@ -7272,6 +7357,7 @@ go = function (s) {
     return;
   }
   __go(s);
+  if (s === "pv") mcStorySyncInbox();
   var SUB = { groups: "گروه‌ها", channels: "کانال‌ها", pv: "پیام‌های خصوصی", profile: "پروفایل من", settings: "تنظیمات", publish: "انتشار برنامه‌ها" };
   var sub = $("hsub");
   if (sub) sub.textContent = SUB[s] || "";
