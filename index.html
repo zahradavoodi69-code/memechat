@@ -219,6 +219,14 @@ button.ghost{background:var(--input);color:var(--text);border:1px solid #3d3428}
 .sring.vthumb .ic path{fill:currentColor}
 .stview{border-radius:14px;min-height:220px;display:flex;align-items:center;justify-content:center;padding:22px}
 .stviewTxt{color:#fff;font-size:1.25rem;font-weight:bold;text-align:center;line-height:1.9;text-shadow:0 1px 6px rgba(0,0,0,.35);word-break:break-word}
+/* پاسخ استوریِ دیگران زیر تصویرِ بلند پنهان نمی‌ماند. */
+#modal .sheet.mcStorySheet{display:flex;flex-direction:column;overflow:hidden}
+#modal .sheet.mcStorySheet #mbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+#modal .sheet.mcStorySheet .mcStoryReplyRow{display:flex;align-items:center;gap:8px;flex:none;
+  margin-top:9px;padding:10px 0 2px;border-top:1px solid rgba(255,140,0,.22);background:var(--panel)}
+#modal .sheet.mcStorySheet .mcStoryReplyRow input{flex:1;min-width:0;width:auto;max-width:none;margin:0;padding:10px 12px;font-size:.82rem}
+#modal .sheet.mcStorySheet .mcStoryReplyRow button{flex:0 0 auto;width:auto;max-width:none;margin:0;padding:10px 12px;font-size:.84rem}
+#modal .sheet.mcStorySheet>button.main{flex:none}
 .mav.hastory{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
 .avbl{position:absolute;bottom:-1px;left:-1px;width:14px;height:14px;font-size:8px;padding-top:1px;border:2px solid var(--bg);border-radius:50%;line-height:1}
 .avbl88{position:absolute;bottom:4px;left:4px;width:24px;height:24px;font-size:12px;padding-top:2px;border:3px solid #141414;border-radius:50%;line-height:1}
@@ -384,6 +392,29 @@ body{background:var(--bg);font-family:Tahoma,"Segoe UI",system-ui,sans-serif}
 .nv.on::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
   width:26px;height:3px;border-radius:0 0 4px 4px;background:var(--accent);box-shadow:0 0 10px rgba(255,140,0,.6)}
 .nv.on span:first-child{opacity:1}
+
+/* فقط نوار پایین شیشه‌ای است؛ بخش‌های دیگر صفحه همان تم تیرهٔ میم‌چت می‌مانند. */
+#nav{position:relative;z-index:35;align-self:stretch;flex:0 0 70px;height:70px;min-height:70px;
+  margin:0 10px calc(8px + env(safe-area-inset-bottom));padding:5px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.2);border-radius:24px;
+  background:linear-gradient(145deg,rgba(50,49,53,.78),rgba(25,24,27,.84));
+  -webkit-backdrop-filter:blur(16px) saturate(1.35);backdrop-filter:blur(16px) saturate(1.35);
+  box-shadow:0 12px 30px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.12)}
+#nav::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.09),transparent 46%,rgba(255,140,0,.035))}
+#nav .nv{position:relative;z-index:1;align-self:stretch;justify-content:center;min-width:0;
+  gap:2px;padding:5px 1px;border:1px solid transparent;border-radius:19px;
+  color:#c1bbb5;font-size:.62rem;line-height:1.25;transition:background .18s,color .18s,transform .18s}
+#nav .nv .ic{width:22px;height:22px;stroke-width:1.8}
+#nav .nv.on{color:var(--gold);border-color:rgba(255,177,89,.43);
+  background:linear-gradient(145deg,rgba(255,255,255,.16),rgba(255,140,0,.13));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 3px 12px rgba(0,0,0,.16)}
+#nav .nv.on .ic{color:var(--accent);stroke-width:2}
+#nav .nv.on::before{display:none}
+#nav .nv:active{transform:scale(.96)}
+@media(max-width:360px){#nav{flex-basis:64px;height:64px;min-height:64px;margin-inline:6px;border-radius:21px}
+  #nav .nv{font-size:.56rem;gap:1px;padding:4px 0;border-radius:16px}
+  #nav .nv .ic{width:20px;height:20px}}
 
 /* -------------------------------- لیست‌ها -------------------------------- */
 .list{padding:4px 0 8px}
@@ -1709,13 +1740,15 @@ async function viewStory(id){
     '<button class="btn" id="stLikeBtn" style="flex:0 0 auto;color:'+(liked?"#ff5b6e":"inherit")+'" onclick="mcStoryLike(\''+ea(x.id)+'\')">'+emo("heart",16)+' <span id="stLikeCount">'+likes.length+'</span></button>'+
     (mineStory&&likes.length?'<div style="font-size:.75rem;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">لایک از: '+esc(mcLikesNames(x))+'</div>':"")+
     '</div>';
-  var replyRow = (!mineStory&&x.userId)?('<div style="margin-top:10px;display:flex;gap:8px"><input id="stReplyIn" placeholder="جواب استوری رو بنویس…" maxlength="300" style="flex:1;min-width:0" onkeydown="if(event.key===\'Enter\')mcStoryReply(\''+ea(x.id)+'\')"><button class="main" id="stReplySend" style="flex:0 0 auto;max-width:110px" onclick="mcStoryReply(\''+ea(x.id)+'\')">فرستادن</button></div>'):"";
+  var replyRow = (!mineStory&&x.userId)?('<div class="mcStoryReplyRow"><input id="stReplyIn" aria-label="پاسخ به استوری" placeholder="جواب استوری رو بنویس…" maxlength="300" onkeydown="if(event.key===\'Enter\')mcStoryReply(\''+ea(x.id)+'\')"><button class="main" id="stReplySend" onclick="mcStoryReply(\''+ea(x.id)+'\')">فرستادن</button></div>'):"";
   modal("استوری — "+esc(x.name||""),
-    bodyHtml+likeRow+replyRow+
+    bodyHtml+likeRow+
     '<div style="margin-top:10px;display:flex;gap:8px">'+
     (x.userId?'<button class="btn" style="flex:1" onclick="closeModal();mcUserPopup(\''+ea(x.userId)+'\',{name:\''+ea(x.name||"")+'\'})">پروفایل</button>':"")+
     ((mineStory||staffStory)?'<button class="btn danger" style="flex:1" onclick="mcStoryDelete(\''+ea(x.id)+'\')">حذف</button>':"")+
     '<button class="btn" style="flex:1" onclick="closeModal()">بستن</button></div>');
+  var storySheet=$("modal").querySelector(".sheet");
+  if(storySheet){storySheet.classList.add("mcStorySheet");if(replyRow)$("mbody").insertAdjacentHTML("afterend",replyRow)}
 }
 /* ===== v1.4.4 — دکمهٔ ویس/ویدیو دایره‌ای سمت راست: ضربه=تعویض حالت، نگه‌داشتن=ضبط ===== */
 var REC_MODE = "voice", __vHold = null, __vHeld = false, __vidRec = null, __vidChunks = [], __vidTimer = null, __vbtnInit = false;
@@ -2242,7 +2275,11 @@ function sendFile(e){
   };
   rd.readAsDataURL(f);
 }
-function modal(title,html){$("mtitle").textContent=title;$("mbody").innerHTML=html;$("modal").style.display="flex"}
+function modal(title,html){
+  var sheet=$("modal").querySelector(".sheet");
+  if(sheet){sheet.classList.remove("mcStorySheet");var old=sheet.querySelector(".mcStoryReplyRow");if(old)old.remove()}
+  $("mtitle").textContent=title;$("mbody").innerHTML=html;$("modal").style.display="flex";
+}
 function closeModal(){try{if(window.__pubBlobUrl){URL.revokeObjectURL(window.__pubBlobUrl);window.__pubBlobUrl=null;}}catch(e){}try{var vs=$("modal").querySelectorAll("video,audio");for(var vi=0;vi<vs.length;vi++){try{vs[vi].pause();vs[vi].removeAttribute("src");vs[vi].load();}catch(e){}}}catch(e){}$("modal").style.display="none"}
 function newRoom(type){
   modal(type==="channel"?"کانال جدید":"گروه جدید",
@@ -3382,14 +3419,16 @@ function mcStoryLike(id) {
   });
 }
 async function mcStoryReply(id) {
-  var inp = $("stReplyIn");
+  var inp = $("stReplyIn"),b = $("stReplySend");
+  if (b && b.disabled) return;
   var t = ((inp && inp.value) || "").trim();
   if (!t) { toast("اول بنویس چی بگی"); return; }
-  var b = $("stReplySend");
   if (b) { b.disabled = true; b.textContent = "داره میره…"; }
-  var r = await api("/api/chat?action=story-reply", { method: "POST", body: { id: id, text: t } });
-  if (b) { b.disabled = false; b.textContent = "فرستادن"; }
-  if (!r.ok || !r.data || !r.data.success) { toast((r.data && r.data.error) || "پاسخ نرفت"); return; }
+  var r;
+  try { r = await api("/api/chat?action=story-reply", { method: "POST", body: { id: id, text: t } }); }
+  catch (e) { toast("اتصال برقرار نشد؛ دوباره تلاش کن"); return; }
+  finally { if (b) { b.disabled = false; b.textContent = "فرستادن"; } }
+  if (!r || !r.ok || !r.data || !r.data.success) { toast((r && r.data && r.data.error) || "پاسخ نرفت"); return; }
   closeModal();
   var x = null;
   for (var i = 0; i < storyCache.length; i++) if (storyCache[i].id === id) x = storyCache[i];
