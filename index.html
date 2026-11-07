@@ -272,6 +272,7 @@ input:focus{box-shadow:0 0 0 3px rgba(255,140,0,.14)}
 .tprog{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(0,0,0,.5)}
 .tprog i{display:block;height:100%;background:var(--accent);width:0}
 .terr{position:absolute;inset:auto 0 0 0;background:#c0392b;color:#fff;font-size:.58rem;text-align:center;padding:2px;cursor:pointer}
+.qreason{flex:0 0 auto;max-width:155px;align-self:center;color:#ffb4ab;font-size:.7rem;line-height:1.5;overflow-wrap:anywhere}
 .attachgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .abtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 6px;border-radius:14px;border:1px solid #33291d;background:#1b1b1b;color:var(--text);font-size:.78rem;cursor:pointer}
 .abtn:hover{border-color:var(--accent)}
@@ -3286,7 +3287,8 @@ function newCid() { return "c" + Date.now().toString(36) + Math.random().toStrin
 async function sendMsg() {
   if (!inChat || !chat) return;
   var i = $("msgIn"), t = (i.value || "").trim();
-  if (!t) return;
+  // The main send button should send a queued attachment when the text box is empty.
+  if (!t) { if (QUEUE.length && !editId) sendQueue(); return; }
   if (editId) {
     var id = editId; cancelEdit(); i.value = "";
     var e = await api("/api/chat?action=edit", { method: "POST", body: { id: id, text: t } });
@@ -3481,7 +3483,7 @@ function attachSheet() {
     '<button class="abtn" onclick="closeModal();document.getElementById(\'camIn\').click()">' + svgIcon("camera") + "<span>دوربین</span></button>" +
     '<button class="abtn" onclick="closeModal();document.getElementById(\'docIn\').click()">' + svgIcon("doc") + "<span>فایل</span></button>" +
     "</div>" +
-    '<div class="hint" style="margin-top:12px">برای عکس و ویدیو از گالری استفاده کن؛ برای PDF و ZIP از فایل.</div>');
+    '<div class="hint" style="margin-top:12px">در گفتگو عکس، ویدیو و صدا تا ۱٫۲۵ مگابایت قابل ارسال‌اند. برای ZIP، APK و HTML از بخش «انتشار» استفاده کن.</div>');
 }
 function svgIcon(k) {
   var p = {
@@ -3495,19 +3497,77 @@ function svgIcon(k) {
 }
 var QID = 1;
 function nextQid() { return QID++; }
-function queueFiles(fileList) {
-  if (!inChat || !chat) { toast("اول یه چت باز کن"); return; }
-  var arr = Array.prototype.slice.call(fileList || []);
-  arr.forEach(function (f) {
-    if (!f) return;
-    var limitMb = Math.min(Number(SET.maxUploadMB || 1.3), 1.3);
-    if (f.size > limitMb * 1024 * 1024) {
-      toast("«" + f.name + "» بزرگ‌تر از " + limitMb + " مگابایت است (سقف فعلی سرور)");
-      return;
-    }
-    QUEUE.push({ file: f, qid: nextQid(), state: "ready", progress: 0, error: "", url: (window.URL && URL.createObjectURL) ? URL.createObjectURL(f) : "" });
+function mcMediaMime(f) {
+  var t = String(f.type || "").toLowerCase().split(";")[0];
+  if (/^(image|audio|video)\/[a-z0-9.+-]+$/.test(t)) return t;
+  var ext = String(f.name || "").toLowerCase().split(".").pop();
+  return ({ jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", gif:"image/gif",
+    heic:"image/heic", heif:"image/heif", mp4:"video/mp4", m4v:"video/mp4", mov:"video/quicktime",
+    webm:"video/webm", ogv:"video/ogg", mp3:"audio/mpeg", m4a:"audio/mp4", wav:"audio/wav",
+    aac:"audio/aac", ogg:"audio/ogg", opus:"audio/ogg" })[ext] || "";
+}
+function mcShrinkPhoto(f, maxBytes) {
+  return new Promise(function (resolve, reject) {
+    var img = new Image(), u = URL.createObjectURL(f);
+    img.onerror = function () { URL.revokeObjectURL(u); reject(new Error("decode")); };
+    img.onload = function () {
+      URL.revokeObjectURL(u);
+      var c = document.createElement("canvas");
+      var scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+      c.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      c.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      var ctx = c.getContext("2d");
+      if (!ctx) { reject(new Error("canvas")); return; }
+      function encode(quality, tries) {
+        try {
+          ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          c.toBlob(function (b) {
+            if (!b) { reject(new Error("encode")); return; }
+            if (b.size <= maxBytes) {
+              resolve(new File([b], String(f.name || "photo").replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" }));
+            } else if (tries < 5) {
+              c.width = Math.max(1, Math.round(c.width * .8));
+              c.height = Math.max(1, Math.round(c.height * .8));
+              encode(Math.max(.5, quality - .08), tries + 1);
+            } else reject(new Error("too_large"));
+          }, "image/jpeg", quality);
+        } catch (e) { reject(e); }
+      }
+      encode(.82, 0);
+    };
+    img.src = u;
   });
-  drawTray();
+}
+async function queueFiles(fileList) {
+  if (!inChat || !chat) { toast("اول یه چت باز کن"); return; }
+  var arr = Array.prototype.slice.call(fileList || []), topic = chat.topic;
+  // Base64 increases size by ~33%; the send API accepts at most 1,800,000 characters.
+  var limitMb = Math.min(Math.max(Number(SET.maxUploadMB || 1.25), 0.1), 1.25);
+  var maxBytes = Math.floor(limitMb * 1024 * 1024);
+  for (var j = 0; j < arr.length; j++) {
+    var f = arr[j];
+    if (!f) continue;
+    var mime = mcMediaMime(f);
+    if (!mime) { toast("این نوع فایل در گفتگو پشتیبانی نمی‌شود؛ فایل برنامه را از بخش انتشار بفرست."); continue; }
+    if (!f.size) { toast("فایل انتخاب‌شده خالی است."); continue; }
+    if (f.size > maxBytes) {
+      if (/^image\/(jpeg|png|webp|heic|heif)$/.test(mime) && f.size < 20 * 1024 * 1024) {
+        toast("دارم عکس را برای ارسال کم‌حجم می‌کنم…");
+        try { f = await mcShrinkPhoto(f, maxBytes); mime = "image/jpeg"; }
+        catch (e) { toast("این عکس کم‌حجم نشد؛ عکس کوچک‌تری انتخاب کن."); continue; }
+      } else {
+        toast("«" + f.name + "» بزرگ‌تر از " + String(limitMb).replace(".", "٫") + " مگابایت است؛ فایل کم‌حجم‌تری انتخاب کن.");
+        continue;
+      }
+    }
+    if (!inChat || !chat || chat.topic !== topic) { toast("گفتگو عوض شد؛ فایل را دوباره انتخاب کن."); return; }
+    // FileReader uses File.type for the data URL, not just the type in JSON.
+    if (f.type !== mime) f = new File([f], f.name, { type: mime, lastModified: f.lastModified });
+    QUEUE.push({ file: f, topic: topic, cid: newCid(), qid: nextQid(), state: "ready", progress: 0,
+      error: "", url: (window.URL && URL.createObjectURL) ? URL.createObjectURL(f) : "" });
+    drawTray();
+  }
 }
 function drawTray() {
   var t = $("tray");
@@ -3524,10 +3584,11 @@ function drawTray() {
     else if (isVid) h += '<video src="' + q.url + '" muted playsinline></video>';
     else h += '<div class="tfile">' + esc((q.file.name || "فایل").slice(0, 12)) + "</div>";
     if (q.state === "uploading") h += '<div class="tprog"><i style="width:' + q.progress + '%"></i></div>';
-    if (q.state === "error") h += '<div class="terr" onclick="retryUpload(' + idx + ')">تلاش دوباره</div>';
+    if (q.state === "error") h += '<div class="terr" role="button" onclick="retryUpload(' + idx + ')">تلاش دوباره</div>';
     h += "</div>";
     h += '<button type="button" class="tx" onclick="dropQueued(' + idx + ')" aria-label="حذف">×</button>';
     h += "</div>";
+    if (q.state === "error" && q.error) h += '<div class="qreason" role="alert">' + esc(q.error) + '</div>';
   });
   h += '<button type="button" class="btn primary small" onclick="sendQueue()">ارسال ' + QUEUE.length + "</button>";
   t.innerHTML = h;
@@ -3535,12 +3596,16 @@ function drawTray() {
 }
 function dropQueued(idx) {
   var q = QUEUE[idx];
-  if (q && q.url) URL.revokeObjectURL(q.url);
+  if (!q) return;
   QUEUE.splice(idx, 1);
+  if (q.xhr) q.xhr.abort();
+  if (q.url) URL.revokeObjectURL(q.url);
   drawTray();
 }
 function retryUpload(idx) {
-  QUEUE[idx].state = "ready"; QUEUE[idx].error = "";
+  var q = QUEUE[idx];
+  if (!q || q.state === "uploading") return;
+  q.state = "ready"; q.error = "";
   drawTray();
   uploadOne(idx);
 }
@@ -3549,26 +3614,49 @@ function updateSendState() {
   if (!b) return;
   b.classList.toggle("hasq", QUEUE.length > 0);
 }
-function sendQueue() {
+function sendQueue(includeErrors) {
+  if (QUEUE.some(function (q) { return q.state === "uploading"; })) return;
   for (var i = 0; i < QUEUE.length; i++) {
-    if (QUEUE[i].state === "ready") { uploadOne(i); return; }
+    if (QUEUE[i].state === "ready" || (includeErrors !== false && QUEUE[i].state === "error")) {
+      QUEUE[i].state = "ready"; QUEUE[i].error = "";
+      uploadOne(i);
+      return;
+    }
   }
 }
 function uploadOne(idx) {
   var q = QUEUE[idx];
   if (!q || q.state === "uploading") return;
+  function uploadError(reason) {
+    if (QUEUE.indexOf(q) < 0) return;
+    q.state = "error"; q.progress = 0;
+    q.error = reason || "ارسال نشد؛ دوباره تلاش کن.";
+    drawTray();
+    toast(q.error);
+  }
   q.state = "uploading"; q.progress = 0;
   drawTray();
+  var token = "";
+  try { token = localStorage.getItem("mc_token") || ""; } catch (e) {}
+  if (!token) { uploadError("برای ارسال دوباره وارد حساب خودت شو."); return; }
   var rd = new FileReader();
   rd.onload = function () {
+    if (QUEUE.indexOf(q) < 0) return;
+    if (typeof rd.result !== "string" || !/^data:(image|audio|video)\//.test(rd.result)) {
+      uploadError("این فایل قابل خواندن نیست؛ یک عکس، ویدیو یا فایل صوتی انتخاب کن."); return;
+    }
     var body = JSON.stringify({
-      topic: chat.topic, text: "", cid: newCid(),
-      file: { name: q.file.name || "file", type: q.file.type || "application/octet-stream", data: rd.result }
+      topic: q.topic, text: "", cid: q.cid,
+      file: { name: q.file.name || "file", type: q.file.type, data: rd.result }
     });
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/api/chat?action=send", true);
-    xhr.withCredentials = true;
+    q.xhr = xhr;
+    // Pages is static: sending to /api/chat on github.io returns 405. Use the same
+    // Supabase endpoint and bearer token as api(), with NO cross-origin cookies.
+    xhr.open("POST", (window.MC_API || "") + "/api/chat?action=send", true);
+    xhr.timeout = 45000;
     xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
     xhr.upload.onprogress = function (ev) {
       if (ev.lengthComputable) {
         q.progress = Math.round((ev.loaded / ev.total) * 100);
@@ -3577,33 +3665,31 @@ function uploadOne(idx) {
       }
     };
     xhr.onload = function () {
-      var ok = false, msg = null;
-      try { var d = JSON.parse(xhr.responseText); ok = xhr.status >= 200 && xhr.status < 300 && d.success; msg = d.message; } catch (e) { }
-      if (ok) {
-        q.state = "sent";
+      if (QUEUE.indexOf(q) < 0) return;
+      var d = {};
+      try { d = JSON.parse(xhr.responseText); } catch (e) {}
+      if (xhr.status >= 200 && xhr.status < 300 && d.success) {
         QUEUE = QUEUE.filter(function (x) { return x !== q; });
-        if (msg) { MSG.byId[msg.id] = msg; MSG.list.push(msg); insertBubble(msg); }
+        if (q.url) URL.revokeObjectURL(q.url);
+        if (d.message && chat && chat.topic === q.topic) {
+          MSG.byId[d.message.id] = d.message; MSG.list.push(d.message); insertBubble(d.message);
+        }
         drawTray();
-        setTimeout(sendQueue, 120);
+        setTimeout(function () { sendQueue(false); }, 120);
         poll(false);
-      } else {
-        q.state = "error";
-        q.error = "ارسال نشد";
-        drawTray();
-      }
+      } else uploadError(d.error || (xhr.status === 413 ? "حجم فایل از سقف سرور بیشتر است." :
+        xhr.status === 401 ? "نشست شما تمام شده؛ دوباره وارد شو." : "ارسال نشد (خطای " + xhr.status + ")."));
     };
-    xhr.onerror = function () { q.state = "error"; drawTray(); };
-    xhr.send(body);
+    xhr.onerror = function () { uploadError("اتصال به سرور برقرار نشد؛ دوباره تلاش کن."); };
+    xhr.ontimeout = function () { uploadError("ارسال طول کشید؛ دوباره تلاش کن."); };
+    try { xhr.send(body); } catch (e) { uploadError("ارسال فایل آغاز نشد؛ دوباره تلاش کن."); }
   };
-  rd.readAsDataURL(q.file);
+  rd.onerror = function () { uploadError("خواندن فایل ناموفق بود؛ دوباره انتخابش کن."); };
+  try { rd.readAsDataURL(q.file); } catch (e) { uploadError("این فایل قابل خواندن نیست."); }
 }
 function onPickMedia(ev) {
-  var files = ev.target.files;
-  Array.prototype.slice.call(files || []).forEach(function (f) {
-    QUEUE.push({ file: f, qid: nextQid(), state: "ready", progress: 0, error: "", url: URL.createObjectURL(f) });
-  });
+  queueFiles(ev.target.files);
   ev.target.value = "";
-  drawTray();
 }
 
 /* ---------------- settings ---------------------------------------------- */
