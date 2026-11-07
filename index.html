@@ -387,6 +387,8 @@ body{background:var(--bg);font-family:Tahoma,"Segoe UI",system-ui,sans-serif}
 
 /* -------------------------------- لیست‌ها -------------------------------- */
 .list{padding:4px 0 8px}
+/* پنل نتایجِ خالی نباید نصف ارتفاع فهرست و اسکرول گفتگوها را اشغال کند. */
+#resGroups,#resChannels{display:none}
 .row{padding:9px 12px;gap:12px;border-bottom:none;border-radius:0}
 .row:active{background:rgba(255,140,0,.09)}
 .row .av{border-radius:50%}
@@ -4191,14 +4193,17 @@ function roomSearchDebounce(scope) {
   if (!inp) return;
   var q = String(inp.value || "").trim();
   if (RQ_TIMER) clearTimeout(RQ_TIMER);
-  RQ_TIMER = setTimeout(function () { doRoomSearch(scope, q); }, 280);
+  RQ_TIMER = null;
+  if (!q) { doRoomSearch(scope, ""); return; }
+  RQ_TIMER = setTimeout(function () { RQ_TIMER = null; doRoomSearch(scope, q); }, 280);
 }
 function clearRoomSearch(scope) {
+  if (RQ_TIMER) { clearTimeout(RQ_TIMER); RQ_TIMER = null; }
   var inp = $(scope === "group" ? "gq" : "cq");
   if (inp) inp.value = "";
   RRES[scope] = [];
   var box = $(scope === "group" ? "resGroups" : "resChannels");
-  if (box) box.innerHTML = "";
+  if (box) { box.innerHTML = ""; box.style.display = ""; }
   var list = $(scope === "group" ? "listGroups" : "listChannels");
   if (list) list.style.display = "";
 }
@@ -4206,11 +4211,14 @@ async function doRoomSearch(scope, q) {
   var box = $(scope === "group" ? "resGroups" : "resChannels");
   var list = $(scope === "group" ? "listGroups" : "listChannels");
   if (!box) return;
-  if (!q) { RRES[scope] = []; box.innerHTML = ""; if (list) list.style.display = ""; return; }
+  if (!q) { RRES[scope] = []; box.innerHTML = ""; box.style.display = ""; if (list) list.style.display = ""; return; }
+  box.style.display = "block";
   box.innerHTML = '<div class="empty">دارم می‌گردم…</div>';
   if (list) list.style.display = "none";
   var type = scope === "group" ? "group" : "channel";
   var r = await api("/api/chat?action=search-rooms&type=" + type + "&q=" + encodeURIComponent(q));
+  var inp = $(scope === "group" ? "gq" : "cq");
+  if (!inp || String(inp.value || "").trim() !== q) return;
   if (!r.ok || !r.data || !r.data.success) {
     box.innerHTML = '<div class="empty">' + esc((r.data && r.data.error) || "جستجو نشد — دوباره تلاش کن") + "</div>";
     return;
@@ -4275,8 +4283,9 @@ async function openRoomFromSearch(rm) {
   open(type, rm.id, rm.name, rm.topic || MAIN);
 }
 function closeSearchPanels() {
+  if (RQ_TIMER) { clearTimeout(RQ_TIMER); RQ_TIMER = null; }
   ["gq", "cq"].forEach(function (id) { var e = $(id); if (e) e.value = ""; });
-  ["resGroups", "resChannels"].forEach(function (id) { var e = $(id); if (e) e.innerHTML = ""; });
+  ["resGroups", "resChannels"].forEach(function (id) { var e = $(id); if (e) { e.innerHTML = ""; e.style.display = ""; } });
   ["listGroups", "listChannels"].forEach(function (id) { var e = $(id); if (e) e.style.display = ""; });
 }
 
