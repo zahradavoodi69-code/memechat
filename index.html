@@ -1427,6 +1427,57 @@ var AVA_CACHE={};
 function mcTitle(x,fb){ if(x&&typeof x==="object"){ return String(x.name||x.title||x.text||x.username||fb||""); } return String(x==null?"":x); }
 function col(n){var s=String(n||"?"),h=0;for(var i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);var c=["#e91e63","#9c27b0","#673ab7","#3f51b5","#2196f3","#009688","#4caf50","#ff9800","#795548"];return c[Math.abs(h)%c.length]}
 function note(m,err){var b=$("notice");if(!m){b.style.display="none";b.textContent="";return}b.style.display="block";b.style.borderColor=err?"var(--danger)":"var(--ok)";b.style.color=err?"#ffb4ab":"#abebc6";b.textContent=m}
+/* v54.15: پاسخ به‌روزرسانی در حالت «داخل گفتگو» سبک‌تر است و بعضی فیلدها (تیک،
+   پریمیوم، نقش) را همراه ندارد. جایگزینی کامل باعث می‌شد این نشان‌ها ناگهان غیب شوند؛
+   پس فقط فیلدهایی که در پاسخ تازه واقعاً آمده‌اند روی نسخهٔ قبلی نوشته می‌شوند. */
+function mcMergeObj(prev,next){
+  if(!next) return prev;
+  if(!prev) return next;
+  var out={},k;
+  for(k in prev) out[k]=prev[k];
+  for(k in next) out[k]=next[k];
+  return out;
+}
+/* v54.15: حافظهٔ نشان‌ها بر اساس شناسهٔ کاربر. هر پاسخی که اطلاعات نشان را داشته
+   باشد آن را به‌روز می‌کند؛ بعداً هر جا این فیلدها غایب بودند از همین حافظه پر می‌شود. */
+var MC_UF = {};
+function mcLearnUser(o){
+  if(!o) return;
+  var id=(o.fromId!=null?o.fromId:(o.id!=null?o.id:(o.userId!=null?o.userId:null)));
+  if(id==null) return;
+  var k=String(id), cur=MC_UF[k]||(MC_UF[k]={});
+  if(o.blue!=null)cur.blue=!!o.blue;
+  if(o.blueTick!=null)cur.blue=!!o.blueTick;
+  if(o.hasBlueTick!=null)cur.blue=!!o.hasBlueTick;
+  if(o.green!=null)cur.green=!!o.green;
+  if(o.hasGreenTick!=null)cur.green=!!o.hasGreenTick;
+  if(o.orange!=null)cur.orange=!!o.orange;
+  if(o.verifiedOrange!=null)cur.orange=!!o.verifiedOrange;
+  if(o.premium!=null)cur.premium=!!o.premium;
+  if(o.isPremium!=null)cur.premium=!!o.isPremium;
+  if(o.goldName!=null)cur.goldName=!!o.goldName;
+  if(o.goldNameEnabled!=null)cur.goldName=!!o.goldNameEnabled;
+  if(o.role!=null)cur.role=o.role;
+  if(o.avatar!=null)cur.avatar=o.avatar;
+}
+function mcWithFlags(o){
+  if(!o) return o;
+  var id=(o.fromId!=null?o.fromId:(o.id!=null?o.id:null));
+  if(id==null) return o;
+  var f=MC_UF[String(id)];
+  return f?mcMergeObj(f,o):o;
+}
+function mcMergeList(prevList,nextList,key){
+  if(!nextList||!nextList.length) return prevList||nextList||[];
+  if(!prevList||!prevList.length) return nextList;
+  var idx={};
+  prevList.forEach(function(x){ if(x&&x[key]!=null) idx[String(x[key])]=x; });
+  return nextList.map(function(x){
+    if(!x||x[key]==null) return x;
+    var p=idx[String(x[key])];
+    return p?mcMergeObj(p,x):x;
+  });
+}
 function toast(t){var d=document.createElement("div");d.className="toast";d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.style.opacity="0"},2600);setTimeout(function(){d.remove()},3400)}
 /* MemHttp — هستهٔ انتقال میم‌چت: حذف درخواست‌های تکراری، کش کوتاه GET، تلاش مجدد شبکه */
 var MH = { cache: {}, inflight: {} };
@@ -1642,9 +1693,9 @@ async function poll(force){
     if(r.status===401){stopPolling();me=null;$("app").style.display="none";$("login").style.display="flex";return}
     if(!r.ok||!r.data.success){$("status").textContent="اختلال شبکه";return}
     $("status").textContent="آنلاین";
-    if(r.data.me){me=r.data.me;paint()}
-    rooms=(r.data.rooms&&r.data.rooms.length)?r.data.rooms:rooms;
-    dir=(r.data.directory&&r.data.directory.length)?r.data.directory:dir;
+    if(r.data.me){me=mcMergeObj(me,r.data.me);paint()}
+    rooms=(r.data.rooms&&r.data.rooms.length)?mcMergeList(rooms,r.data.rooms,"id"):rooms;
+    dir=(r.data.directory&&r.data.directory.length)?mcMergeList(dir,r.data.directory,"id"):dir;
     if(force||!inChat){drawGroups();drawChannels();drawPV()}
     if(inChat&&chat&&chat.topic===topic){
       syncMsgs(r.data.messages||[]);
@@ -2132,6 +2183,8 @@ function drawReacts(box,rs){
   });
 }
 function build(m){
+  /* v54.15: اگر پاسخ تازه فیلد نشان‌ها را نداشت، از حافظهٔ نشان‌ها پر می‌شود */
+  if(typeof mcLearnUser==="function"){ try{ mcLearnUser(m); m=mcWithFlags(m); }catch(e){} }
   var mine=me&&String(m.fromId)===String(me.id);
   var mediaType=m.file?String(m.file.type||((m.file.data||"").match(/^data:([^;]+)/)||[])[1]||""):"";
   var isRoundVideo=!!(m.file&&/^video\//.test(mediaType)&&/^round_/i.test(m.file.name||""));
@@ -2150,13 +2203,7 @@ function build(m){
   var b=document.createElement("div");b.className="bub";
   if(m.bubbleColor){try{b.style.background=m.bubbleColor}catch(e){}}
   if(m.bubbleShape){var SHP={soft:"16px",sharp:"4px",round:"22px"};if(SHP[m.bubbleShape])b.style.borderRadius=SHP[m.bubbleShape]}
-  var tk="";
-  if(m.role==="owner"||m.goldName)tk+='<span class="tick gold" title="مالک / نام طلایی">✓</span>';
-  else if(m.role==="super")tk+='<span class="tick purple" title="سوپرادمین">✓</span>';
-  else if(m.role==="admin")tk+='<span class="tick adm" title="ادمین">✓</span>';
-  if(m.orange)tk+='<span class="vtick" title="تأییدشده (بررسی‌شده)">✓</span>';
-  if(m.green)tk+='<span class="tick green" title="نشان سبز">✓</span>';else if(m.blue)tk+='<span class="tick blue" title="نشان آبی (خریدنی)">✓</span>';
-  if(m.premium)tk+=mcPremStar(14);
+  var tk = (typeof mcTicks==="function") ? mcTicks(m) : "";
   var nfS="";
   if(m.nameFont==="mono") nfS=' style="font-family:monospace"';
   else if(m.nameFont==="serif") nfS=' style="font-family:Georgia,serif"';
@@ -2286,7 +2333,11 @@ function syncMsgs(list){
   list.forEach(function(m){
     var e=msgs[m.id];
     if(e){
-      if(e.m.text!==m.text){e.tx.innerHTML=fmt(m.text);e.m=m}
+      /* v54.15: اطلاعات قبلی پیام (تیک/پریمیوم فرستنده) حفظ می‌شود تا اگر پاسخ تازه
+         این فیلدها را نداشت، نشان‌ها غیب نشوند. */
+      var _prevM=e.m;
+      e.m=mcMergeObj(_prevM,m);
+      if(_prevM.text!==m.text){e.tx.innerHTML=fmt(m.text)}
       drawReacts(e.rb,m.reactions||{});
     }else{box.appendChild(build(m));added=true}
   });
@@ -3132,7 +3183,10 @@ async function poll(force) {
     NET.state = "online"; NET.error = ""; NET.backoff = 4000;
     netBar("");
     $("status").textContent = "آنلاین";
-    if (r.data.me) { me = r.data.me; paint(); }
+    if (r.data.me) {
+      me = mcMergeObj(me, r.data.me); paint();
+      try { mcLearnUser(me); } catch (e) {}
+    }
     if (inChat && chat && chat.topic === topic) { applyTyping(r.data.typing || []); }
     if (typeof r.data.staffOpenTickets === "number") {
       window.STAFF_OPEN = r.data.staffOpenTickets;
@@ -3161,8 +3215,10 @@ async function poll(force) {
       }
     } catch(e){}
     if (r.data.rooms) {
-      rooms = r.data.rooms;
-      if (r.data.directory) dir = r.data.directory;
+      /* v54.15: ادغام با فهرست قبلی تا نشان/سازندهٔ اتاق وقتی در پاسخ غایب است نپرد */
+      rooms = mcMergeList(rooms, r.data.rooms, "id");
+      if (r.data.directory) dir = mcMergeList(dir, r.data.directory, "id");
+      try { (dir || []).forEach(function (u) { mcLearnUser(u); }); } catch (e) {}
       LEFT_ROOMS = {};
       (r.data.left || []).forEach(function (id) { LEFT_ROOMS[String(id)] = 1; });
       rememberRoomNames(rooms);
@@ -3234,15 +3290,21 @@ function mergeMessages(list, mode) {
       if(prev.file&&prev.file.data&&m.file&&m.file.pending&&!m.file.data)m.file=prev.file;
       if(prev.__fileLoading){m.__fileLoading=true;m.__fileLoadPromise=prev.__fileLoadPromise}
       if ((prev.text !== m.text) || (JSON.stringify(prev.reactions || {}) !== JSON.stringify(m.reactions || {}))) {
-        MSG.byId[m.id] = m;
-        var mi=MSG.list.indexOf(prev);if(mi>=0)MSG.list[mi]=m;
-        updateBubble(m);
+        /* v54.15: اطلاعات قبلی (نشان/نقش فرستنده) حفظ می‌شود؛ نسخهٔ تازه اگر این
+           فیلدها را نداشته باشد نباید باعث غیب‌شدن تیک شود. */
+        var _merged = mcMergeObj(prev, m);
+        MSG.byId[m.id] = _merged;
+        var mi=MSG.list.indexOf(prev);if(mi>=0)MSG.list[mi]=_merged;
+        updateBubble(_merged);
       }
       return;
     }
-    MSG.byId[m.id] = m;
-    MSG.list.push(m);
-    insertBubble(m);
+    /* v54.15: نشان‌های شناخته‌شدهٔ فرستنده از حافظه پر می‌شود */
+    var _fresh = (typeof mcWithFlags==="function") ? mcWithFlags(m) : m;
+    if (typeof mcLearnUser==="function") { try { mcLearnUser(_fresh); } catch(e){} }
+    MSG.byId[m.id] = _fresh;
+    MSG.list.push(_fresh);
+    insertBubble(_fresh);
     newIds.push(m.id);
     fresh = true;
   });
@@ -6442,6 +6504,8 @@ async function mcFetchCard(q) {
     return;
   }
   var c = r.data.card;
+  /* v54.15: نشان‌های کاربر از حافظه کامل می‌شود تا کارت بدون تیک نماند */
+  try { mcLearnUser(c); c = mcWithFlags(c); } catch (e) {}
   /* v54.15: درخواست بوست بدون محدودیت زمانی بود و اگر گم می‌شد، کارت پروفایل
      برای همیشه روی اسکلتون بارگذاری می‌ماند. */
   var boost = { ok: false, data: {} };
@@ -7929,6 +7993,7 @@ async function mcUserPopupFill(q, f) {
   catch (e) { r = { ok: false, data: {} }; }
   if (!body) return;
   var c = (r.ok && r.data && r.data.success) ? r.data.card : null;
+  try { if (c) { mcLearnUser(c); c = mcWithFlags(c); } } catch (e) {}
   var name = (c && c.name) || f.name || q;
   var uname = (c && c.username) || (/^[a-z0-9_.]+$/i.test(q) ? q : "");
   var ava = (c && c.avatar) || f.ava || "";
