@@ -1585,17 +1585,20 @@ function enter(u){
 }
 function paint(){
   if(!me)return;
+  /* v54.15: تحمل هر دو شکل نام‌گذاری فیلدها */
+  var _blue=!!(me.hasBlueTick||me.blueTick||me.blue||me.blue_tick);
+  var _prem=!!(me.isPremium||me.premium||me.is_premium);
   $("coins").textContent=(me.coins>=999999?"∞":me.coins)+" MCC";
   $("pname").textContent=mcTitle(me.name,"");
   $("pid").innerHTML='<bdi dir="ltr">@'+esc(me.id)+"</bdi> • <bdi dir=\"ltr\">@"+esc(me.username)+"</bdi>";
   $("prole").textContent=role(me.role);
   $("pcoins").textContent=me.coins>=999999?"∞":me.coins;
-  $("pblue").textContent=me.hasBlueTick?"✓":"✗";
-  $("pprem").textContent=me.isPremium?"✓":"✗";
+  $("pblue").textContent=_blue?"✓":"✗";
+  $("pprem").textContent=_prem?"✓":"✗";
   var a=$("pav"),h="";
   if(me.avatar){h='<img src="'+ea(me.avatar)+'" alt="">';a.style.background="transparent"}else{h=esc((me.name||"?").charAt(0));a.style.background=col(me.name)}
   h+='<div class="edit">تغییر عکس</div>';
-  if(me.hasBlueTick)h+='<span class="tick blue" style="position:absolute;bottom:0;left:0;width:20px;height:20px;border:2px solid #1a1410">✓</span>';
+  if(_blue)h+='<span class="tick blue" style="position:absolute;bottom:0;left:0;width:20px;height:20px;border:2px solid #1a1410">✓</span>';
   a.innerHTML=h;
   var mod=["owner","super","admin"].indexOf(me.role)>=0;
   $("adminMenu").style.display=mod?"block":"none";
@@ -2029,6 +2032,8 @@ async function toggleVoice(){
 function mcUnseen(topic){
   try{
     if(!topic) return false;
+    /* v54.15: اتاقی که همین حالا باز است «پیام جدید» حساب نمی‌شود */
+    if(inChat && chat && chat.topic===topic) return false;
     var seen=JSON.parse(localStorage.getItem(MC_SEEN_KEY)||"{}");
     var latest=(window.CHAT_LATEST||{})[topic]||0;
     return latest > (seen[topic]||0);
@@ -2090,12 +2095,7 @@ async function searchUsers(){
   box.innerHTML="";
   list.forEach(function(u){
     var d=document.createElement("div");d.className="row";d.style.padding="10px 0";
-    var tk="";
-    if(u.role==="owner")tk='<span class="tick gold" title="مالک">✓</span>';
-    else if(u.role==="super")tk='<span class="tick purple" title="سوپرادمین">✓</span>';
-    else if(u.role==="admin")tk='<span class="tick adm" title="ادمین">✓</span>';
-    if(u.orange)tk+='<span class="vtick" title="تأییدشده (بررسی‌شده)">✓</span>';
-    if(u.green)tk+='<span class="tick green" title="نشان سبز">✓</span>';else if(u.blue)tk+='<span class="tick blue" title="نشان آبی (خریدنی)">✓</span>';
+    var tk = (typeof mcTicks==="function") ? mcTicks(u) : "";
     var nm=u.name||u.username||"?";
     d.innerHTML='<div class="av" style="background:'+col(nm)+'">'+esc(String(nm).charAt(0))+'</div>'+
       '<div class="info"><div class="nm">'+esc(nm)+' '+tk+'</div><div class="sub">@'+esc(u.username||"")+'</div></div>'+
@@ -2540,8 +2540,17 @@ window.addEventListener("DOMContentLoaded",async function(){
       try{enter(r.data.user)}catch(e){settled=false;showLogin()}
       var sp1=$("bootSplash");if(sp1)sp1.remove();
     }
-    else showLogin();
-  }catch(e){showLogin()}
+    else{
+      showLogin();
+      /* v54.15: اگر سرور اصلاً پاسخ نداد، کاربر بداند مشکل از اینترنت/فیلتر است */
+      if(!r||r.status===0){
+        try{note("به سرور وصل نشدم — اینترنت یا فیلترشکن را بررسی کن و صفحه را دوباره باز کن.",1)}catch(e){}
+      }
+    }
+  }catch(e){
+    showLogin();
+    try{note("به سرور وصل نشدم — اینترنت یا فیلترشکن را بررسی کن و صفحه را دوباره باز کن.",1)}catch(e){}
+  }
   clearTimeout(bootTimer);
 });
 /* ============================================================================
@@ -3129,7 +3138,18 @@ async function poll(force) {
       window.STAFF_OPEN = r.data.staffOpenTickets;
       if (typeof mcStaffBadge === "function") mcStaffBadge();
     }
-    if (r.data.latest) { window.CHAT_LATEST = r.data.latest; try { drawGroups(); drawChannels(); drawPV(); } catch(e){} }
+    if (r.data.latest) {
+      window.CHAT_LATEST = r.data.latest;
+      /* v54.15: اتاقی که باز است همیشه خوانده‌شده علامت می‌خورد تا بعد از خروج نشان الکی نماند */
+      if (inChat && chat && chat.topic) {
+        try {
+          var _s = JSON.parse(localStorage.getItem(MC_SEEN_KEY) || "{}");
+          var _lv = r.data.latest[chat.topic] || 0;
+          if (_lv > (_s[chat.topic] || 0)) { _s[chat.topic] = _lv; localStorage.setItem(MC_SEEN_KEY, JSON.stringify(_s)); }
+        } catch (e) {}
+      }
+      try { drawGroups(); drawChannels(); drawPV(); } catch(e){}
+    }
     if (typeof r.data.myBoost === "boolean") window.MY_BOOST = r.data.myBoost;
     try {
       var pb=$("pinBar");
@@ -3689,7 +3709,14 @@ function open(type, id, title, topic) {
   if (cb) cb.style.display = type === "pv" ? "" : "none";
   $("msgIn").focus();
   netBar("");
-  try{ var seen0=JSON.parse(localStorage.getItem(MC_SEEN_KEY)||"{}"); seen0[topic]=Date.now(); localStorage.setItem(MC_SEEN_KEY,JSON.stringify(seen0)); }catch(e){}
+  try{
+    var seen0=JSON.parse(localStorage.getItem(MC_SEEN_KEY)||"{}");
+    /* v54.15: مهر «دیده‌شده» باید از آخرین پیام سرور هم جلوتر باشد، وگرنه اگر ساعت
+       سرور کمی از ساعت دستگاه جلو باشد، نشان پیام جدید روی همان اتاق باقی می‌ماند. */
+    var _latest=(window.CHAT_LATEST||{})[topic]||0;
+    seen0[topic]=Math.max(Date.now(), _latest);
+    localStorage.setItem(MC_SEEN_KEY,JSON.stringify(seen0));
+  }catch(e){}
   poll(true);
 }
 
@@ -6151,14 +6178,21 @@ function mcAva(name, ava, size) {
 function mcTicks(o) {
   var h = "";
   if (!o) return h;
+  /* v54.15: نام فیلدها بین پاسخ‌های سرور یکسان نیست (hasBlueTick / blueTick / blue
+     و isPremium / premium). هر سه شکل پذیرفته می‌شود تا نشان‌ها هیچ‌وقت گم نشوند. */
   var role = o.role || "user";
-  if (role === "owner" || o.goldName) h += '<span class="tick gold" title="مالک / نام طلایی">✓</span>';
+  var goldName = !!(o.goldName || o.goldNameEnabled || o.gold_name);
+  var orange = !!(o.orange || o.hasOrangeBadge || o.verifiedOrange || o.verified_orange);
+  var green = !!(o.green || o.hasGreenTick || o.greenTick || o.green_tick);
+  var blue = !!(o.blue || o.hasBlueTick || o.blueTick || o.blue_tick);
+  var premium = !!(o.premium || o.isPremium || o.is_premium);
+  if (role === "owner" || goldName) h += '<span class="tick gold" title="مالک / نام طلایی">✓</span>';
   else if (role === "super") h += '<span class="tick purple" title="سوپرادمین">✓</span>';
   else if (role === "admin") h += '<span class="tick adm" title="ادمین">✓</span>';
-  if (o.orange) h += '<span class="vtick" title="تأییدشده پس از بررسی">✓</span>';
-  if (o.green) h += '<span class="tick green" title="نشان سبز">✓</span>';
-  else if (o.blue) h += '<span class="tick blue" title="نشان آبی">✓</span>';
-  if (o.premium) h += mcPremStar(13);
+  if (orange) h += '<span class="vtick" title="تأییدشده پس از بررسی">✓</span>';
+  if (green) h += '<span class="tick green" title="نشان سبز">✓</span>';
+  else if (blue) h += '<span class="tick blue" title="نشان آبی">✓</span>';
+  if (premium) h += mcPremStar(13);
   return h;
 }
 function mcIco(k, cls) {
@@ -6408,8 +6442,11 @@ async function mcFetchCard(q) {
     return;
   }
   var c = r.data.card;
-  var boost = await api("/api/chat?action=boosts&target=" + encodeURIComponent(c.id));
-  var bs = (boost.ok && boost.data && boost.data.success) ? boost.data : { total: c.boostTotal, level: c.boostLevel, boosters: [] };
+  /* v54.15: درخواست بوست بدون محدودیت زمانی بود و اگر گم می‌شد، کارت پروفایل
+     برای همیشه روی اسکلتون بارگذاری می‌ماند. */
+  var boost = { ok: false, data: {} };
+  try { boost = await api("/api/chat?action=boosts&target=" + encodeURIComponent(c.id), { timeout: 8000 }); } catch (e) {}
+  var bs = (boost && boost.ok && boost.data && boost.data.success) ? boost.data : { total: c.boostTotal, level: c.boostLevel, boosters: [] };
   var h = mcSheetHead(c.name || "کاربر", "@" + c.username, "");
   h += '<div class="mcsBody">';
   h += '<div class="pvTop">';
@@ -7886,7 +7923,10 @@ function mcUserPopup(id, fallback) {
 }
 async function mcUserPopupFill(q, f) {
   var body = document.querySelector("#mcSheet .mcsBody");
-  var r = await api("/api/chat?action=user-card&id=" + encodeURIComponent(q));
+  /* v54.15: بدون timeout کارت پروفایل می‌توانست برای همیشه روی اسکلتون بماند */
+  var r;
+  try { r = await api("/api/chat?action=user-card&id=" + encodeURIComponent(q), { timeout: 9000 }); }
+  catch (e) { r = { ok: false, data: {} }; }
   if (!body) return;
   var c = (r.ok && r.data && r.data.success) ? r.data.card : null;
   var name = (c && c.name) || f.name || q;
