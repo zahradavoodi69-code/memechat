@@ -1,0 +1,12 @@
+{
+  "name": "memechat-forgot-password",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Additive, OTP-verified, no-delete forgot-password & password-reset module for MemeChat (scrypt + session_epoch revocation).",
+  "scripts": {
+    "test": "node tests/run.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
